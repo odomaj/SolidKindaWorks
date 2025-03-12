@@ -1,4 +1,4 @@
-import view_types
+from views import view_types
 import numpy as np
 
 

@@ -1,6 +1,4 @@
-import view_types
-import ray_trace
-import standard
+from views import view_types, ray_trace, standard
 
 
 class Viewer:
