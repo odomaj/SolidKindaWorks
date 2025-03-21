@@ -17,7 +17,7 @@
    <bool>true</bool>
   </property>
   <property name="tabShape">
-   <enum>QTabWidget::Rounded</enum>
+   <enum>QTabWidget::TabShape::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="display">
@@ -33,7 +33,7 @@
      <string>load or create project</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignmentFlag::AlignCenter</set>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -76,29 +76,60 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="Insert">
+      <widget class="QComboBox" name="Insert">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="text">
+       <property name="currentIndex">
+        <number>-1</number>
+       </property>
+       <property name="placeholderText">
         <string>Insert</string>
        </property>
+       <item>
+        <property name="text">
+         <string>Sphere</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Triangle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Cube</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="View">
+      <widget class="QComboBox" name="View">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="text">
+       <property name="currentIndex">
+        <number>-1</number>
+       </property>
+       <property name="placeholderText">
         <string>View</string>
        </property>
+       <item>
+        <property name="text">
+         <string>Orthographic</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Perspective</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
@@ -110,7 +141,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
