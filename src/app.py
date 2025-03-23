@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QPushButton
 from PySide6.QtCore import QFile, QSize, QPoint
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QImage, QPixmap, QImageReader, QResizeEvent
@@ -12,6 +12,7 @@ import numpy as np
 
 QT_UI_DIR: Path = Path(__file__).parent.joinpath("qt")
 UI_FILE: str = "main.ui"
+COMPONENTS_FILE: str = "componenets.ui"
 
 
 class MainWindow(QMainWindow):
@@ -28,21 +29,61 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self.load_ui()
+        self.init_mode_listeners()
         self.display: QLabel = self.home_widget.findChild(QLabel, "display")
 
         self.resize(800, 600)
         self.setCentralWidget(self.home_widget)
 
+        self.handle_file_push()
+
         self.show()
 
     def load_ui(self) -> None:
+        loader = QUiLoader()
         ui_file = QFile(QT_UI_DIR.joinpath(UI_FILE))
         if ui_file.open(QFile.ReadOnly):
-            loader = QUiLoader()
             self.home_widget = loader.load(ui_file)
             ui_file.close()
+        comp_file = QFile(QT_UI_DIR.joinpath(COMPONENTS_FILE))
+        if comp_file.open(QFile.ReadOnly):
+            self.comp_widgets = loader.load(comp_file)
+            comp_file.close()
+
+    def init_mode_listeners(self) -> None:
+        self.file_button: QPushButton = self.home_widget.findChild(
+            QPushButton, "File"
+        )
+        self.home_button: QPushButton = self.home_widget.findChild(
+            QPushButton, "Home"
+        )
+        self.insert_button: QPushButton = self.home_widget.findChild(
+            QPushButton, "Insert"
+        )
+        self.view_button: QPushButton = self.home_widget.findChild(
+            QPushButton, "View"
+        )
+
+        self.file_button.clicked.connect(self.handle_file_push)
+        self.home_button.clicked.connect(self.handle_home_push)
+        self.insert_button.clicked.connect(self.handle_insert_push)
+        self.view_button.clicked.connect(self.handle_view_push)
+
+    def handle_file_push(self) -> None:
+        self.state = self.WindowState.FILE
+
+    def handle_home_push(self) -> None:
+        self.state = self.WindowState.HOME
+
+    def handle_insert_push(self) -> None:
+        self.state = self.WindowState.INSERT
+
+    def handle_view_push(self) -> None:
+        self.state = self.WindowState.VIEW
 
     def update_display(self) -> None:
+        if self.state == self.WindowState.FILE:
+            return
         dimensions: common_types.Display = common_types.Display(
             width=np.int32(self.display.size().width()),
             height=np.int32(self.display.size().height()),
