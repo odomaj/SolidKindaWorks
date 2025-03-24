@@ -109,10 +109,10 @@
       <x>0</x>
       <y>61</y>
       <width>120</width>
-      <height>80</height>
+      <height>240</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout"/>
+    <layout class="QVBoxLayout" name="sidebar"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
