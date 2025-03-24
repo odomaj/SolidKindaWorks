@@ -1,4 +1,5 @@
 numpy==2.2.3
+pymesh==1.0.2
 PySide6==6.8.2.1
 PySide6_Addons==6.8.2.1
 PySide6_Essentials==6.8.2.1
