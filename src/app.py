@@ -318,6 +318,7 @@ class MainWindow(QMainWindow):
             plotter.show(camera=cam).screenshot('test.png') #camera=cam , interactive=True allows mesh to be moved around in seperate plot
             
             pixmap = QPixmap('test.png')
+            pixmap.scaled(dimensions.width,dimensions.height)
             self.display.setPixmap(pixmap)
 
 
