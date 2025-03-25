@@ -20,6 +20,7 @@ import numpy as np
 import trimesh
 from trimesh import rendering
 #import pyglet
+from vedo import Mesh,show,Plotter
 
 QT_UI_DIR: Path = Path(__file__).parent.joinpath("qt")
 UI_FILE: str = "main.ui"
@@ -297,15 +298,28 @@ class MainWindow(QMainWindow):
             self.display.setPixmap(QPixmap.fromImage(image))
 
         else:
-            mesh = trimesh.creation.box()
-            scene = mesh.scene()
-            res = (dimensions.width,dimensions.height)
-            png = scene.save_image(resolution = res,visible=True)
+            verts = [(50,50,50), (70,40,50), (50,40,80), (80,70,50)]
+            faces = [(0,1,2),(2,1,3),(1,0,3)]
 
+            mesh = Mesh([verts,faces])
+            mesh.backcolor('violet').linecolor('tomato').linewidth(2)
+
+            #cameraposition can be moved around
+            cam = dict(
+                position=(0, 0, -10),
+                focal_point=(50, 40, 50),
+                viewup=(0.357535, 0.925400, 0.125714),
+                distance=200,
+                clipping_range=(120.677, 257.285),
+                )
+
+            plotter = Plotter(offscreen=True) #when set to false a seperate plot opens that allows the user to move around the mesh
+            plotter.add(mesh)
+            plotter.show(camera=cam).screenshot('test.png') #camera=cam , interactive=True allows mesh to be moved around in seperate plot
             
-            qimage = QImage.fromData(bytes(png))
-            self.display.setPixmap(QPixmap.fromImage(qimage))
-            
+            pixmap = QPixmap('test.png')
+            self.display.setPixmap(pixmap)
+
 
     def resize_display(self) -> None:
         screen_size: QSize = self.size()
