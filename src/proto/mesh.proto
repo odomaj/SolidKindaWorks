@@ -1,0 +1,19 @@
+
+syntax = "proto3";
+
+message Shape {
+    uint32 row = 1;
+    uint32 col = 2;
+}
+
+message Mesh {
+    string id = 1;
+    Shape vertices_shape = 2;
+    bytes vertices = 3;
+    Shape faces_shape = 4;
+    bytes faces = 5;
+    bytes color = 6;
+    float ka = 7;
+    float kd = 8;
+    float ks = 9;
+}
