@@ -50,7 +50,8 @@ class MainWindow(QMainWindow):
 
     @dataclass
     class InsertMenu:
-        pass
+        mesh_label: QLabel
+        mesh_combo: QComboBox
 
     @dataclass
     class ViewMenu:
@@ -155,7 +156,15 @@ class MainWindow(QMainWindow):
         pass
 
     def init_insert_menu(self) -> None:
-        pass
+        self.insert_menu = self.InsertMenu(
+            mesh_label = self.comp_widgets.findChild(QLabel, "mesh_label"),
+            mesh_combo = self.comp_widgets.findChild(QComboBox, "mesh_combo"),
+        )
+
+        self.sidebar.addWidget(self.insert_menu.mesh_label)
+        self.sidebar.addWidget(self.insert_menu.mesh_combo)
+
+        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
 
     def init_view_menu(self) -> None:
         self.view_menu = self.ViewMenu(
@@ -220,7 +229,8 @@ class MainWindow(QMainWindow):
         pass
 
     def show_insert(self) -> None:
-        pass
+        self.insert_menu.mesh_label.show()
+        self.insert_menu.mesh_combo.show()
 
     def show_view(self) -> None:
         self.view_menu.ray_tracing_label.show()
@@ -252,6 +262,10 @@ class MainWindow(QMainWindow):
     def view_projection(self, index: int) -> None:
         """event handler for self.view_menu.projection_combo"""
         print("view_projection")
+
+    def insert_mesh(self,index:int) ->None:
+        """event handler for self.insert_menu.mesh_combo"""
+        print("insert_mesh")
 
     def update_display(self) -> None:
         if not self.have_working_file:

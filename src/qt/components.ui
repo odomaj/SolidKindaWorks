@@ -106,6 +106,73 @@
      </widget>
     </item>
    </layout>
+    <layout class="QVBoxLayout" name="View">
+    <item>
+     <widget class="QLabel" name="ray_tracing_label">
+      <property name="text">
+       <string>Ray Tracing</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="ray_tracing_combo">
+      <item>
+       <property name="text">
+        <string>Off</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>On</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="projection_label">
+      <property name="text">
+       <string>Projection Type</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="projection_combo">
+      <item>
+       <property name="text">
+        <string>Orthographic</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Perspective</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+   </layout>
+    <layout class="QVBoxLayout" name="Insert"> 
+    <item>
+     <widget class="QLabel" name="mesh_label">
+      <property name="text">
+       <string>Mesh</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="mesh_combo">
+      <item>
+       <property name="text">
+        <string>Test1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Test2</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
