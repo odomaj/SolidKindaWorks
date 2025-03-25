@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 from random import choice
 from string import ascii_letters, digits
 from pathlib import Path
@@ -7,28 +7,28 @@ import trimesh
 import struct
 import numpy as np
 
-Vertex = Annotated[np.typing.NDArray, "3 Array"]
-Vertices = Annotated[np.typing.NDArray, "N x 3 Array"]
-Faces = Annotated[np.typing.NDArray, "N Array"]
-Color_RGB = Annotated[np.typing.NDArray, "array of length 3, ranging from 0 to 255"]
+Vertex = Annotated[np.ndarray[Any, np.dtype[np.float64]], "shape=(3)"]
+Vertices = Annotated[np.ndarray[Any, np.dtype[np.float64]], "shape=(N,3)"]
+Faces = Annotated[np.ndarray[Any, np.dtype[np.int64]], "shape=(N,M)"]
+Color_RGB = Annotated[np.ndarray[Any, np.dtype[np.uint8]], "shape=(3)"]
 
 
 class Mesh:
-    id: str
-    mesh: trimesh.Trimesh
-    color: Color_RGB
-    ka: np.float32
-    kd: np.float32
-    ks: np.float32
+    id: str | None
+    mesh: trimesh.Trimesh | None
+    color: Color_RGB | None
+    ka: np.float32 | None
+    kd: np.float32 | None
+    ks: np.float32 | None
 
     def __init__(
         self,
-        id: str = None,
-        mesh: trimesh.Trimesh = None,
-        color: Color_RGB = None,
-        ka: np.float32 = None,
-        kd: np.float32 = None,
-        ks: np.float32 = None,
+        id: str | None = None,
+        mesh: trimesh.Trimesh | None = None,
+        color: Color_RGB | None = None,
+        ka: np.float32 | None = None,
+        kd: np.float32 | None = None,
+        ks: np.float32 | None = None,
     ) -> None:
         self.id = id
         self.mesh = mesh
@@ -38,15 +38,17 @@ class Mesh:
         self.ks = ks
 
     def serialize(self) -> bytes:
-        protobuf = proto.mesh_pb2.Mesh()
+        protobuf = proto.mesh_pb2.Mesh()  # type: ignore
         protobuf.id = self.id
-        protobuf.vertices_shape.row = self.mesh.vertices.shape[0]
-        protobuf.vertices_shape.col = self.mesh.vertices.shape[1]
-        protobuf.vertices = self.mesh.vertices.tobytes()
-        protobuf.faces_shape.row = self.mesh.faces.shape[0]
-        protobuf.faces_shape.col = self.mesh.faces.shape[1]
-        protobuf.faces = self.mesh.faces.tobytes()
-        protobuf.color = self.color.tobytes()
+        if self.mesh is not None:
+            protobuf.vertices_shape.row = self.mesh.vertices.shape[0]
+            protobuf.vertices_shape.col = self.mesh.vertices.shape[1]
+            protobuf.vertices = self.mesh.vertices.tobytes()
+            protobuf.faces_shape.row = self.mesh.faces.shape[0]
+            protobuf.faces_shape.col = self.mesh.faces.shape[1]
+            protobuf.faces = self.mesh.faces.tobytes()
+        if self.color is not None:
+            protobuf.color = self.color.tobytes()
         protobuf.ka = self.ka
         protobuf.kd = self.kd
         protobuf.ks = self.ks
@@ -54,7 +56,7 @@ class Mesh:
         return protobuf.SerializeToString()
 
     def load(self, serialized_proto: bytes) -> None:
-        protobuf = proto.mesh_pb2.Mesh()
+        protobuf = proto.mesh_pb2.Mesh()  # type: ignore
         protobuf.ParseFromString(serialized_proto)
 
         vertices = np.frombuffer(protobuf.vertices, dtype=np.float64)
@@ -72,7 +74,7 @@ class Mesh:
 
     def __str__(self) -> str:
         return (
-            f"[id: {self.id}, mesh.vertices: {self.mesh.vertices}, mesh.faces: {self.mesh.faces},"
+            f"[id: {self.id}, mesh.vertices: {self.mesh.vertices}, mesh.faces: {self.mesh.faces},"  # type: ignore
             f" color: {self.color}, ka: {self.ka}, kd: {self.kd}, ks: {self.ks}]"
         )
 
@@ -100,6 +102,8 @@ class Meshes:
         )
 
     def add_mesh(self, mesh: Mesh) -> None:
+        if mesh.id == None:
+            return
         self.meshes[mesh.id] = mesh
 
     def gen_id(self, len: int) -> str:
