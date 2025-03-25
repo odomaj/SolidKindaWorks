@@ -17,6 +17,9 @@ from views.view import Viewer
 from enum import Enum
 import common_types
 import numpy as np
+import trimesh
+from trimesh import rendering
+#import pyglet
 
 QT_UI_DIR: Path = Path(__file__).parent.joinpath("qt")
 UI_FILE: str = "main.ui"
@@ -266,26 +269,43 @@ class MainWindow(QMainWindow):
     def insert_mesh(self,index:int) ->None:
         """event handler for self.insert_menu.mesh_combo"""
         print("insert_mesh")
+        print(index)
+        self.update_display(index=index)
+        
+    def update_display(self,**kwargs) -> None:
+        index = kwargs.get('index',None)
 
-    def update_display(self) -> None:
         if not self.have_working_file:
             return
+        
         dimensions: common_types.Display = common_types.Display(
-            width=np.int32(self.display.size().width()),
-            height=np.int32(self.display.size().height()),
-        )
+                width=np.int32(self.display.size().width()),
+                height=np.int32(self.display.size().height()),
+            )
+        
+        if index is None:
+            raster: common_types.Raster = self.viewer.render(dimensions, None)
 
-        raster: common_types.Raster = self.viewer.render(dimensions, None)
+            image: QImage = QImage(
+                raster.data,
+                dimensions.width,
+                dimensions.height,
+                3 * dimensions.width,
+                QImage.Format_RGB888,
+            )
 
-        image: QImage = QImage(
-            raster.data,
-            dimensions.width,
-            dimensions.height,
-            3 * dimensions.width,
-            QImage.Format_RGB888,
-        )
+            self.display.setPixmap(QPixmap.fromImage(image))
 
-        self.display.setPixmap(QPixmap.fromImage(image))
+        else:
+            mesh = trimesh.creation.box()
+            scene = mesh.scene()
+            res = (dimensions.width,dimensions.height)
+            png = scene.save_image(resolution = res,visible=True)
+
+            
+            qimage = QImage.fromData(bytes(png))
+            self.display.setPixmap(QPixmap.fromImage(qimage))
+            
 
     def resize_display(self) -> None:
         screen_size: QSize = self.size()
