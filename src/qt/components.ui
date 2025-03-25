@@ -38,6 +38,9 @@
      </widget>
     </item>
     <item>
+     <widget class="QPlainTextEdit" name="open_text"/>
+    </item>
+    <item>
      <widget class="QPushButton" name="save_button">
       <property name="text">
        <string>Save</string>
@@ -50,6 +53,9 @@
        <string>Save As</string>
       </property>
      </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="save_as_text"/>
     </item>
    </layout>
   </widget>

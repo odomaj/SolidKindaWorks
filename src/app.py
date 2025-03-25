@@ -8,12 +8,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QComboBox,
+    QPlainTextEdit,
 )
 from PySide6.QtCore import QFile, QSize, QPoint
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QImage, QPixmap, QImageReader, QResizeEvent
 import sys
 from views.view import Viewer
+from mesh.mesh import Meshes
 from enum import Enum
 import common_types
 import numpy as np
@@ -41,8 +43,10 @@ class MainWindow(QMainWindow):
     class FileMenu:
         new_button: QPushButton
         open_button: QPushButton
+        open_text: QPlainTextEdit
         save_button: QPushButton
         save_as_button: QPushButton
+        save_as_text: QPlainTextEdit
 
     @dataclass
     class HomeMenu:
@@ -83,6 +87,7 @@ class MainWindow(QMainWindow):
     display: QLabel
 
     viewer: Viewer = Viewer()
+    meshes: Meshes = Meshes()
     sidebar: QVBoxLayout
 
     def __init__(self):
@@ -137,14 +142,18 @@ class MainWindow(QMainWindow):
         self.file_menu = self.FileMenu(
             new_button=self.comp_widgets.findChild(QPushButton, "new_button"),
             open_button=self.comp_widgets.findChild(QPushButton, "open_button"),
+            open_text=self.comp_widgets.findChild(QPlainTextEdit, "open_text"),
             save_button=self.comp_widgets.findChild(QPushButton, "save_button"),
             save_as_button=self.comp_widgets.findChild(QPushButton, "save_as_button"),
+            save_as_text=self.comp_widgets.findChild(QPlainTextEdit, "save_as_text"),
         )
 
         self.sidebar.addWidget(self.file_menu.new_button)
         self.sidebar.addWidget(self.file_menu.open_button)
+        self.sidebar.addWidget(self.file_menu.open_text)
         self.sidebar.addWidget(self.file_menu.save_button)
         self.sidebar.addWidget(self.file_menu.save_as_button)
+        self.sidebar.addWidget(self.file_menu.save_as_text)
 
         self.file_menu.new_button.clicked.connect(self.file_new)
         self.file_menu.open_button.clicked.connect(self.file_open)
@@ -213,8 +222,10 @@ class MainWindow(QMainWindow):
     def show_file(self) -> None:
         self.file_menu.new_button.show()
         self.file_menu.open_button.show()
+        self.file_menu.open_text.show()
         self.file_menu.save_button.show()
         self.file_menu.save_as_button.show()
+        self.file_menu.save_as_text.show()
 
     def show_home(self) -> None:
         pass
@@ -235,15 +246,41 @@ class MainWindow(QMainWindow):
 
     def file_open(self) -> None:
         """event handler for self.file_menu.open_button"""
-        print("file_open")
+        if self.file_menu.open_text.toPlainText() == "":
+            return
+        temp: Path = (
+            Path(__file__)
+            .parent.parent.joinpath("saves")
+            .joinpath(self.file_menu.open_text.toPlainText())
+        )
+        self.file_menu.open_text.clear()
+        if not temp.exists():
+            return
+        self.working_file = temp
+        self.have_working_file = True
+        if not self.meshes.load(self.working_file):
+            self.have_working_file = False
+            self.working_file = None
 
     def file_save(self) -> None:
         """event handler for self.file_menu.save_button"""
-        print("file_save")
+        if self.have_working_file:
+            self.meshes.save(self.working_file)
 
     def file_save_as(self) -> None:
         """event handler for self.file_menu.save_as_button"""
-        print("file_save_as")
+        if self.file_menu.save_as_text.toPlainText() == "":
+            return
+        self.working_file = (
+            Path(__file__)
+            .parent.parent.joinpath("saves")
+            .joinpath(self.file_menu.save_as_text.toPlainText())
+        )
+        self.have_working_file = True
+        self.file_menu.save_as_text.clear()
+        if not self.meshes.save(self.working_file):
+            self.have_working_file = False
+            self.working_file = None
 
     def view_ray_tracing(self, index: int) -> None:
         """event handler for self.view_menu.ray_tracing_combo"""
