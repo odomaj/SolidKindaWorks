@@ -246,6 +246,8 @@ class MainWindow(QMainWindow):
 
     def file_open(self) -> None:
         """event handler for self.file_menu.open_button"""
+        if self.file_menu.open_text.toPlainText() == "":
+            return
         temp: Path = (
             Path(__file__)
             .parent.parent.joinpath("saves")
@@ -267,6 +269,8 @@ class MainWindow(QMainWindow):
 
     def file_save_as(self) -> None:
         """event handler for self.file_menu.save_as_button"""
+        if self.file_menu.save_as_text.toPlainText() == "":
+            return
         self.working_file = (
             Path(__file__)
             .parent.parent.joinpath("saves")
