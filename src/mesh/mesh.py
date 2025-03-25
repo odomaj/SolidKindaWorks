@@ -1,6 +1,3 @@
-import sys
-
-sys.path.append("..")
 from typing import Annotated
 from random import choice
 from string import ascii_letters, digits
@@ -111,52 +108,38 @@ class Meshes:
             if new_id not in self.meshes:
                 return new_id
 
-    def save(self, path: Path) -> None:
-        with path.open("wb") as file:
-            for key in self.meshes:
-                serialized_mesh: bytes = self.meshes[key].serialize()
-                file.write(struct.pack("<I", len(serialized_mesh)))
-                file.write(serialized_mesh)
+    def save(self, path: Path) -> bool:
+        try:
+            with path.open("wb") as file:
+                for key in self.meshes:
+                    serialized_mesh: bytes = self.meshes[key].serialize()
+                    file.write(struct.pack("<I", len(serialized_mesh)))
+                    file.write(serialized_mesh)
+        except Exception as e:
+            print(f"[ERROR] failed to save mesh to {path.absolute()}: {e}")
+            return False
+        return True
 
-    def load(self, path: Path) -> None:
+    def load(self, path: Path) -> bool:
         self.meshes.clear()
-        with path.open("rb") as file:
-            while True:
-                size_data = file.read(4)
-                if not size_data:
-                    break
-                size: int = struct.unpack("<I", size_data)[0]
-                serialized_mesh: bytes = file.read(size)
-                mesh = Mesh()
-                mesh.load(serialized_mesh)
-                self.add_mesh(mesh)
+        try:
+            with path.open("rb") as file:
+                while True:
+                    size_data = file.read(4)
+                    if not size_data:
+                        break
+                    size: int = struct.unpack("<I", size_data)[0]
+                    serialized_mesh: bytes = file.read(size)
+                    mesh = Mesh()
+                    mesh.load(serialized_mesh)
+                    self.add_mesh(mesh)
+        except Exception as e:
+            print(f"[ERROR] failed to load mesh to {path.absolute()}: {e}")
+            return False
+        return True
 
     def __str__(self) -> str:
         output: str = ""
         for key in self.meshes:
             output += f"{self.meshes[key]}\n"
         return output[:-1]
-
-
-if __name__ == "__main__":
-    meshes = Meshes()
-    meshes.gen_mesh(
-        vertices=[[0, 0, 0], [0, 0, 1], [0, 1, 0]],
-        faces=[[0, 1, 2]],
-        color=np.array([4, 18, 19], dtype=np.uint8),
-        ka=0.6,
-        kd=0.5,
-        ks=0.1,
-    )
-    meshes.gen_mesh(
-        vertices=[[1, 1, 1], [1, 1, 2], [1, 2, 1]],
-        faces=[[0, 1, 2]],
-        color=np.array([19, 189, 13], dtype=np.uint8),
-        ka=0.2,
-        kd=0.1,
-        ks=0.9,
-    )
-    print(meshes)
-    meshes.save(Path("test.txt"))
-    meshes.load(Path("test.txt"))
-    print(meshes)
