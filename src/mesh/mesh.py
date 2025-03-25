@@ -2,12 +2,12 @@ import sys
 
 sys.path.append("..")
 from typing import Annotated
-from dataclasses import dataclass
 from random import choice
 from string import ascii_letters, digits
 from pathlib import Path
 import proto.mesh_pb2
 import trimesh
+import struct
 import numpy as np
 
 Vertex = Annotated[np.typing.NDArray, "3 Array"]
@@ -16,7 +16,6 @@ Faces = Annotated[np.typing.NDArray, "N Array"]
 Color_RGB = Annotated[np.typing.NDArray, "array of length 3, ranging from 0 to 255"]
 
 
-@dataclass
 class Mesh:
     id: str
     mesh: trimesh.Trimesh
@@ -24,6 +23,22 @@ class Mesh:
     ka: np.float32
     kd: np.float32
     ks: np.float32
+
+    def __init__(
+        self,
+        id: str = None,
+        mesh: trimesh.Trimesh = None,
+        color: Color_RGB = None,
+        ka: np.float32 = None,
+        kd: np.float32 = None,
+        ks: np.float32 = None,
+    ) -> None:
+        self.id = id
+        self.mesh = mesh
+        self.color = color
+        self.ka = ka
+        self.kd = kd
+        self.ks = ks
 
     def serialize(self) -> bytes:
         protobuf = proto.mesh_pb2.Mesh()
@@ -57,6 +72,12 @@ class Mesh:
         self.ka = np.float32(protobuf.ka)
         self.kd = np.float32(protobuf.kd)
         self.ks = np.float32(protobuf.ks)
+
+    def __str__(self) -> str:
+        return (
+            f"[id: {self.id}, mesh.vertices: {self.mesh.vertices}, mesh.faces: {self.mesh.faces},"
+            f" color: {self.color}, ka: {self.ka}, kd: {self.kd}, ks: {self.ks}]"
+        )
 
 
 class Meshes:
@@ -93,24 +114,49 @@ class Meshes:
     def save(self, path: Path) -> None:
         with path.open("wb") as file:
             for key in self.meshes:
-                file.write(f"{self.meshes[key].serialize()}\n")
+                serialized_mesh: bytes = self.meshes[key].serialize()
+                file.write(struct.pack("<I", len(serialized_mesh)))
+                file.write(serialized_mesh)
 
     def load(self, path: Path) -> None:
+        self.meshes.clear()
         with path.open("rb") as file:
-            lines: list[str] = file.readlines()
-        for line in lines:
-            if line == "":
-                continue
-            mesh = Mesh()
-            self.add_mesh(mesh.load(line))
+            while True:
+                size_data = file.read(4)
+                if not size_data:
+                    break
+                size: int = struct.unpack("<I", size_data)[0]
+                serialized_mesh: bytes = file.read(size)
+                mesh = Mesh()
+                mesh.load(serialized_mesh)
+                self.add_mesh(mesh)
+
+    def __str__(self) -> str:
+        output: str = ""
+        for key in self.meshes:
+            output += f"{self.meshes[key]}\n"
+        return output[:-1]
 
 
 if __name__ == "__main__":
-    mesh = Mesh(
-        id="hello",
-        mesh=trimesh.Trimesh(vertices=[[0, 0, 0], [0, 0, 1], [0, 1, 0]], faces=[[0, 1, 2]]),
+    meshes = Meshes()
+    meshes.gen_mesh(
+        vertices=[[0, 0, 0], [0, 0, 1], [0, 1, 0]],
+        faces=[[0, 1, 2]],
         color=np.array([4, 18, 19], dtype=np.uint8),
         ka=0.6,
         kd=0.5,
         ks=0.1,
     )
+    meshes.gen_mesh(
+        vertices=[[1, 1, 1], [1, 1, 2], [1, 2, 1]],
+        faces=[[0, 1, 2]],
+        color=np.array([19, 189, 13], dtype=np.uint8),
+        ka=0.2,
+        kd=0.1,
+        ks=0.9,
+    )
+    print(meshes)
+    meshes.save(Path("test.txt"))
+    meshes.load(Path("test.txt"))
+    print(meshes)
