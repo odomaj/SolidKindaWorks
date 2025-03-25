@@ -3,108 +3,25 @@ from random import choice
 from string import ascii_letters, digits
 from pathlib import Path
 import proto.mesh_pb2
-import trimesh
+import vedo
 import struct
 import numpy as np
 
 Vertex = Annotated[np.ndarray[Any, np.dtype[np.float64]], "shape=(3)"]
 Vertices = Annotated[np.ndarray[Any, np.dtype[np.float64]], "shape=(N,3)"]
 Faces = Annotated[np.ndarray[Any, np.dtype[np.int64]], "shape=(N,M)"]
-Color_RGB = Annotated[np.ndarray[Any, np.dtype[np.uint8]], "shape=(3)"]
+RGB = Annotated[np.ndarray[Any, np.dtype[np.float64]], "shape=(3)"]
 
 
-class Mesh:
-    id: str | None
-    mesh: trimesh.Trimesh | None
-    color: Color_RGB | None
-    ka: np.float32 | None
-    kd: np.float32 | None
-    ks: np.float32 | None
-
-    def __init__(
-        self,
-        id: str | None = None,
-        mesh: trimesh.Trimesh | None = None,
-        color: Color_RGB | None = None,
-        ka: np.float32 | None = None,
-        kd: np.float32 | None = None,
-        ks: np.float32 | None = None,
-    ) -> None:
-        self.id = id
-        self.mesh = mesh
-        self.color = color
-        self.ka = ka
-        self.kd = kd
-        self.ks = ks
-
-    def serialize(self) -> bytes:
-        protobuf = proto.mesh_pb2.Mesh()  # type: ignore
-        protobuf.id = self.id
-        if self.mesh is not None:
-            protobuf.vertices_shape.row = self.mesh.vertices.shape[0]
-            protobuf.vertices_shape.col = self.mesh.vertices.shape[1]
-            protobuf.vertices = self.mesh.vertices.tobytes()
-            protobuf.faces_shape.row = self.mesh.faces.shape[0]
-            protobuf.faces_shape.col = self.mesh.faces.shape[1]
-            protobuf.faces = self.mesh.faces.tobytes()
-        if self.color is not None:
-            protobuf.color = self.color.tobytes()
-        protobuf.ka = self.ka
-        protobuf.kd = self.kd
-        protobuf.ks = self.ks
-
-        return protobuf.SerializeToString()
-
-    def load(self, serialized_proto: bytes) -> None:
-        protobuf = proto.mesh_pb2.Mesh()  # type: ignore
-        protobuf.ParseFromString(serialized_proto)
-
-        vertices = np.frombuffer(protobuf.vertices, dtype=np.float64)
-        vertices = vertices.reshape((protobuf.vertices_shape.row, protobuf.vertices_shape.col))
-
-        faces = np.frombuffer(protobuf.faces, dtype=np.int64)
-        faces = faces.reshape((protobuf.faces_shape.row, protobuf.faces_shape.col))
-
-        self.id = protobuf.id
-        self.mesh = trimesh.Trimesh(vertices=vertices, faces=faces)
-        self.color = np.frombuffer(protobuf.color, dtype=np.uint8)
-        self.ka = np.float32(protobuf.ka)
-        self.kd = np.float32(protobuf.kd)
-        self.ks = np.float32(protobuf.ks)
-
-    def __str__(self) -> str:
-        return (
-            f"[id: {self.id}, mesh.vertices: {self.mesh.vertices}, mesh.faces: {self.mesh.faces},"  # type: ignore
-            f" color: {self.color}, ka: {self.ka}, kd: {self.kd}, ks: {self.ks}]"
-        )
+ID_LEN = 8
 
 
 class Meshes:
-    meshes: dict[str, Mesh] = {}
+    meshes: dict[str, vedo.Mesh] = {}
 
-    def gen_mesh(
-        self,
-        vertices: Vertices,
-        faces: Faces,
-        color: Color_RGB,
-        ka: np.float32,
-        kd: np.float32,
-        ks: np.float32,
-    ) -> None:
-        new_id = self.gen_id(8)
-        self.meshes[new_id] = Mesh(
-            id=new_id,
-            mesh=trimesh.Trimesh(vertices=vertices, faces=faces),
-            color=color,
-            ka=ka,
-            kd=kd,
-            ks=ks,
-        )
-
-    def add_mesh(self, mesh: Mesh) -> None:
-        if mesh.id == None:
-            return
-        self.meshes[mesh.id] = mesh
+    def add_mesh(self, vertices: Vertices, faces: Faces, color: RGB) -> None:
+        mesh = vedo.Mesh([vertices, faces], c=vedo.colors.get_color(color))  # type: ignore
+        self.meshes[self.gen_id(ID_LEN)] = mesh
 
     def gen_id(self, len: int) -> str:
         while True:
@@ -112,11 +29,47 @@ class Meshes:
             if new_id not in self.meshes:
                 return new_id
 
+    def serialize_mesh(self, id: str, mesh: vedo.Mesh) -> bytes:
+        protobuf = proto.mesh_pb2.Mesh()  # type: ignore
+
+        vertices: Vertices = np.array(mesh.vertices, dtype=np.float64)
+        faces: Faces = np.array(mesh.cells, dtype=np.int64)
+
+        protobuf.id = id
+
+        protobuf.vertices_shape.row = vertices.shape[0]
+        protobuf.vertices_shape.col = vertices.shape[1]
+        protobuf.vertices = vertices.tobytes()
+
+        protobuf.faces_shape.row = faces.shape[0]
+        protobuf.faces_shape.col = faces.shape[1]
+        protobuf.faces = faces.tobytes()
+
+        protobuf.color = np.array(mesh.color(), np.float64).tobytes()
+
+        return protobuf.SerializeToString()
+
+    def deserialize_mesh(self, serialized_mesh: bytes) -> None:
+        protobuf = proto.mesh_pb2.Mesh()  # type: ignore
+        protobuf.ParseFromString(serialized_mesh)
+
+        vertices: Vertices = np.frombuffer(protobuf.vertices, dtype=np.float64)
+        vertices = vertices.reshape((protobuf.vertices_shape.row, protobuf.vertices_shape.col))
+
+        faces: Faces = np.frombuffer(protobuf.faces, dtype=np.int64)
+        faces = faces.reshape((protobuf.faces_shape.row, protobuf.faces_shape.col))
+
+        color: RGB = np.frombuffer(protobuf.color, dtype=np.float64)
+
+        mesh = vedo.Mesh([vertices, faces], c=vedo.colors.get_color(color))  # type: ignore
+
+        self.meshes[protobuf.id] = mesh
+
     def save(self, path: Path) -> bool:
         try:
             with path.open("wb") as file:
-                for key in self.meshes:
-                    serialized_mesh: bytes = self.meshes[key].serialize()
+                for id in self.meshes:
+                    serialized_mesh: bytes = self.serialize_mesh(id, self.meshes[id])
                     file.write(struct.pack("<I", len(serialized_mesh)))
                     file.write(serialized_mesh)
         except Exception as e:
@@ -134,16 +87,8 @@ class Meshes:
                         break
                     size: int = struct.unpack("<I", size_data)[0]
                     serialized_mesh: bytes = file.read(size)
-                    mesh = Mesh()
-                    mesh.load(serialized_mesh)
-                    self.add_mesh(mesh)
+                    self.deserialize_mesh(serialized_mesh)
         except Exception as e:
             print(f"[ERROR] failed to load mesh to {path.absolute()}: {e}")
             return False
         return True
-
-    def __str__(self) -> str:
-        output: str = ""
-        for key in self.meshes:
-            output += f"{self.meshes[key]}\n"
-        return output[:-1]

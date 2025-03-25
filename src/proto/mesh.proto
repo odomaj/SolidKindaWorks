@@ -13,7 +13,4 @@ message Mesh {
     Shape faces_shape = 4;
     bytes faces = 5;
     bytes color = 6;
-    float ka = 7;
-    float kd = 8;
-    float ks = 9;
 }
