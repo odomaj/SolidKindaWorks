@@ -15,9 +15,9 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QImage, QPixmap, QImageReader, QResizeEvent
 import sys
 from views.view import Viewer
+from views import view_types
 from mesh.mesh import Meshes
 from enum import Enum
-import common_types
 import numpy as np
 
 QT_UI_DIR: Path = Path(__file__).parent.joinpath("qt")
@@ -84,20 +84,22 @@ class MainWindow(QMainWindow):
     state: WindowState = WindowState.FILE
 
     # image being displayed by the renderer
-    display: QLabel
+    display: QLabel | None
 
     viewer: Viewer = Viewer()
     meshes: Meshes = Meshes()
-    sidebar: QVBoxLayout
+    sidebar: QVBoxLayout | None
+    file_bar: QVBoxLayout | None
+    view_bar: QVBoxLayout | None
 
     def __init__(self):
         super(MainWindow, self).__init__()
 
         self.load_ui()
-        self.display: QLabel = self.home_widget.findChild(QLabel, "display")
-        self.sidebar: QVBoxLayout = self.home_widget.findChild(QVBoxLayout, "sidebar")
-        self.file_bar: QVBoxLayout = self.comp_widgets.findChild(QVBoxLayout, "File")
-        self.view_bar: QVBoxLayout = self.comp_widgets.findChild(QVBoxLayout, "View")
+        self.display = self.home_widget.findChild(QLabel, "display")
+        self.sidebar = self.home_widget.findChild(QVBoxLayout, "sidebar")
+        self.file_bar = self.comp_widgets.findChild(QVBoxLayout, "File")
+        self.view_bar = self.comp_widgets.findChild(QVBoxLayout, "View")
 
         self.init_main_menu()
 
@@ -117,20 +119,35 @@ class MainWindow(QMainWindow):
     def load_ui(self) -> None:
         loader = QUiLoader()
         ui_file = QFile(QT_UI_DIR.joinpath(UI_FILE))
-        if ui_file.open(QFile.ReadOnly):
+        if ui_file.open(QFile.ReadOnly):  # type: ignore
             self.home_widget = loader.load(ui_file)
             ui_file.close()
         comp_file = QFile(QT_UI_DIR.joinpath(COMPONENTS_FILE))
-        if comp_file.open(QFile.ReadOnly):
+        if comp_file.open(QFile.ReadOnly):  # type: ignore
             self.comp_widgets = loader.load(comp_file)
             comp_file.close()
 
     def init_main_menu(self) -> None:
+        if self.home_widget is None:
+            return
+        file_button = self.home_widget.findChild(QPushButton, "File")
+        home_button = self.home_widget.findChild(QPushButton, "Home")
+        insert_button = self.home_widget.findChild(QPushButton, "Insert")
+        view_button = self.home_widget.findChild(QPushButton, "View")
+        if (
+            file_button is None
+            or home_button is None
+            or insert_button is None
+            or view_button is None
+        ):
+            print("[ERROR] main menu failed to load")
+            return
+
         self.main_menu = self.MainMenu(
-            file_button=self.home_widget.findChild(QPushButton, "File"),
-            home_button=self.home_widget.findChild(QPushButton, "Home"),
-            insert_button=self.home_widget.findChild(QPushButton, "Insert"),
-            view_button=self.home_widget.findChild(QPushButton, "View"),
+            file_button=file_button,
+            home_button=home_button,
+            insert_button=insert_button,
+            view_button=view_button,
         )
 
         self.main_menu.file_button.clicked.connect(self.main_file)
@@ -139,13 +156,31 @@ class MainWindow(QMainWindow):
         self.main_menu.view_button.clicked.connect(self.main_view)
 
     def init_file_menu(self) -> None:
+        if self.comp_widgets is None or self.sidebar is None:
+            return
+        new_button = self.comp_widgets.findChild(QPushButton, "new_button")
+        open_button = self.comp_widgets.findChild(QPushButton, "open_button")
+        open_text = self.comp_widgets.findChild(QPlainTextEdit, "open_text")
+        save_button = self.comp_widgets.findChild(QPushButton, "save_button")
+        save_as_button = self.comp_widgets.findChild(QPushButton, "save_as_button")
+        save_as_text = self.comp_widgets.findChild(QPlainTextEdit, "save_as_text")
+        if (
+            new_button is None
+            or open_button is None
+            or open_text is None
+            or save_button is None
+            or save_as_button is None
+            or save_as_text is None
+        ):
+            print("[ERROR] file menu failed to load")
+            return
         self.file_menu = self.FileMenu(
-            new_button=self.comp_widgets.findChild(QPushButton, "new_button"),
-            open_button=self.comp_widgets.findChild(QPushButton, "open_button"),
-            open_text=self.comp_widgets.findChild(QPlainTextEdit, "open_text"),
-            save_button=self.comp_widgets.findChild(QPushButton, "save_button"),
-            save_as_button=self.comp_widgets.findChild(QPushButton, "save_as_button"),
-            save_as_text=self.comp_widgets.findChild(QPlainTextEdit, "save_as_text"),
+            new_button=new_button,
+            open_button=open_button,
+            open_text=open_text,
+            save_button=save_button,
+            save_as_button=save_as_button,
+            save_as_text=save_as_text,
         )
 
         self.sidebar.addWidget(self.file_menu.new_button)
@@ -167,11 +202,25 @@ class MainWindow(QMainWindow):
         pass
 
     def init_view_menu(self) -> None:
+        if self.comp_widgets is None or self.sidebar is None:
+            return
+        ray_tracing_label = self.comp_widgets.findChild(QLabel, "ray_tracing_label")
+        ray_tracing_combo = self.comp_widgets.findChild(QComboBox, "ray_tracing_combo")
+        projection_label = self.comp_widgets.findChild(QLabel, "projection_label")
+        projection_combo = self.comp_widgets.findChild(QComboBox, "projection_combo")
+        if (
+            ray_tracing_label is None
+            or ray_tracing_combo is None
+            or projection_label is None
+            or projection_combo is None
+        ):
+            print("[ERROR] view menu failed to load")
+            return
         self.view_menu = self.ViewMenu(
-            ray_tracing_label=self.comp_widgets.findChild(QLabel, "ray_tracing_label"),
-            ray_tracing_combo=self.comp_widgets.findChild(QComboBox, "ray_tracing_combo"),
-            projection_label=self.comp_widgets.findChild(QLabel, "projection_label"),
-            projection_combo=self.comp_widgets.findChild(QComboBox, "projection_combo"),
+            ray_tracing_label=ray_tracing_label,
+            ray_tracing_combo=ray_tracing_combo,
+            projection_label=projection_label,
+            projection_combo=projection_combo,
         )
 
         self.sidebar.addWidget(self.view_menu.ray_tracing_label)
@@ -216,6 +265,8 @@ class MainWindow(QMainWindow):
 
     def hide_sidebar(self) -> None:
         """hide all widgets in the sidebar"""
+        if self.sidebar is None:
+            return
         for i in range(self.sidebar.count()):
             self.sidebar.itemAt(i).widget().hide()
 
@@ -261,10 +312,12 @@ class MainWindow(QMainWindow):
         if not self.meshes.load(self.working_file):
             self.have_working_file = False
             self.working_file = None
+        else:
+            self.update_display()
 
     def file_save(self) -> None:
         """event handler for self.file_menu.save_button"""
-        if self.have_working_file:
+        if self.have_working_file and self.working_file is not None:
             self.meshes.save(self.working_file)
 
     def file_save_as(self) -> None:
@@ -291,26 +344,27 @@ class MainWindow(QMainWindow):
         print("view_projection")
 
     def update_display(self) -> None:
-        if not self.have_working_file:
+        if not self.have_working_file or self.display is None:
             return
-        dimensions: common_types.Display = common_types.Display(
-            width=np.int32(self.display.size().width()),
-            height=np.int32(self.display.size().height()),
+        dimensions: view_types.Display = view_types.Display(
+            width=np.int64(self.display.size().width()),
+            height=np.int64(self.display.size().height()),
         )
 
-        raster: common_types.Raster = self.viewer.render(dimensions, None)
-
+        raster: view_types.Raster = self.viewer.render(dimensions, self.meshes)
         image: QImage = QImage(
             raster.data,
-            dimensions.width,
-            dimensions.height,
-            3 * dimensions.width,
-            QImage.Format_RGB888,
+            int(dimensions.width),
+            int(dimensions.height),
+            int(3 * dimensions.width),
+            QImage.Format_RGB888,  # type: ignore
         )
 
         self.display.setPixmap(QPixmap.fromImage(image))
 
     def resize_display(self) -> None:
+        if self.display is None:
+            return
         screen_size: QSize = self.size()
         display_pos: QPoint = self.display.pos()
 
