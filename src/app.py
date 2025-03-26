@@ -17,9 +17,6 @@ from views.view import Viewer
 from enum import Enum
 import common_types
 import numpy as np
-import trimesh
-from trimesh import rendering
-#import pyglet
 from vedo import Mesh,show,Plotter
 
 QT_UI_DIR: Path = Path(__file__).parent.joinpath("qt")
