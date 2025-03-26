@@ -337,11 +337,23 @@ class MainWindow(QMainWindow):
 
     def view_ray_tracing(self, index: int) -> None:
         """event handler for self.view_menu.ray_tracing_combo"""
-        print("view_ray_tracing")
+        # On = 1
+        # Off = 0
+        if index == 1:
+            self.viewer.render_mode = Viewer.Rendering.RAY_TRACE
+        else:
+            self.viewer.render_mode = Viewer.Rendering.RASTERIZE
+        self.update_display()
 
     def view_projection(self, index: int) -> None:
         """event handler for self.view_menu.projection_combo"""
-        print("view_projection")
+        # orthographic = 0
+        # perspective = 1
+        if index == 1:
+            self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
+        else:
+            self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
+        self.update_display()
 
     def update_display(self) -> None:
         if not self.have_working_file or self.display is None:

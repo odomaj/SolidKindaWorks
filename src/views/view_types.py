@@ -10,13 +10,3 @@ Raster = Annotated[np.ndarray[Any, np.dtype[Any]], "M x N Raster"]
 class Display:
     width: np.int64
     height: np.int64
-
-
-class Lighting(Enum):
-    RAY_TRACE = 1
-    STANDARD = 2
-
-
-class Perspective(Enum):
-    ORTHOGONAL = 1
-    PERSPECTIVE = 2
