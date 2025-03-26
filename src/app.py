@@ -116,34 +116,6 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-        self.meshes.add_mesh(
-            np.array(
-                [
-                    [0, 0, 0],
-                    [1, 0, 0],
-                    [1, 1, 0],
-                    [0, 1, 0],
-                    [0, 0, 1],
-                    [1, 0, 1],
-                    [1, 1, 1],
-                    [0, 1, 1],
-                ],
-                dtype=np.float64,
-            ),
-            np.array(
-                [
-                    [0, 1, 2, 3],
-                    [4, 5, 6, 7],
-                    [0, 1, 5, 4],
-                    [1, 2, 6, 5],
-                    [2, 3, 7, 6],
-                    [3, 0, 4, 7],
-                ],
-                dtype=np.int64,
-            ),
-            np.array([17, 189, 101], dtype=np.float64),
-        )
-
     def load_ui(self) -> None:
         loader = QUiLoader()
         ui_file = QFile(QT_UI_DIR.joinpath(UI_FILE))
