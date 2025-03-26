@@ -116,6 +116,34 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+        self.meshes.add_mesh(
+            np.array(
+                [
+                    [0, 0, 0],
+                    [1, 0, 0],
+                    [1, 1, 0],
+                    [0, 1, 0],
+                    [0, 0, 1],
+                    [1, 0, 1],
+                    [1, 1, 1],
+                    [0, 1, 1],
+                ],
+                dtype=np.float64,
+            ),
+            np.array(
+                [
+                    [0, 1, 2, 3],
+                    [4, 5, 6, 7],
+                    [0, 1, 5, 4],
+                    [1, 2, 6, 5],
+                    [2, 3, 7, 6],
+                    [3, 0, 4, 7],
+                ],
+                dtype=np.int64,
+            ),
+            np.array([17, 189, 101], dtype=np.float64),
+        )
+
     def load_ui(self) -> None:
         loader = QUiLoader()
         ui_file = QFile(QT_UI_DIR.joinpath(UI_FILE))
@@ -337,11 +365,23 @@ class MainWindow(QMainWindow):
 
     def view_ray_tracing(self, index: int) -> None:
         """event handler for self.view_menu.ray_tracing_combo"""
-        print("view_ray_tracing")
+        # On = 1
+        # Off = 0
+        if index == 1:
+            self.viewer.render_mode = Viewer.Rendering.RAY_TRACE
+        else:
+            self.viewer.render_mode = Viewer.Rendering.RASTERIZE
+        self.update_display()
 
     def view_projection(self, index: int) -> None:
         """event handler for self.view_menu.projection_combo"""
-        print("view_projection")
+        # orthographic = 0
+        # perspective = 1
+        if index == 1:
+            self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
+        else:
+            self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
+        self.update_display()
 
     def update_display(self) -> None:
         if not self.have_working_file or self.display is None:
