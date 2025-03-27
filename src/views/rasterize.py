@@ -9,7 +9,7 @@ def render(
     meshes: Meshes,
     cam: camera.Camera,
 ) -> view_types.Raster:
-    plotter = vedo.Plotter(offscreen=True)
+    plotter = vedo.Plotter(offscreen=False)
     for key in meshes.meshes:
         plotter.add(meshes.meshes[key])
 
