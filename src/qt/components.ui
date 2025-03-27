@@ -112,6 +112,29 @@
      </widget>
     </item>
    </layout>
+   <layout class="QVBoxLayout" name="Insert"> 
+    <item>
+     <widget class="QLabel" name="mesh_label">
+      <property name="text">
+       <string>Select A Mesh to Add</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QComboBox" name="mesh_combo">
+      <item>
+       <property name="text">
+        <string>Sample Mesh 1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sample Mesh 2</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    </layout>
   </widget>
  </widget>
  <resources/>
