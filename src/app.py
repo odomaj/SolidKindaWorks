@@ -54,7 +54,8 @@ class MainWindow(QMainWindow):
 
     @dataclass
     class InsertMenu:
-        pass
+        mesh_label: QLabel
+        mesh_combo: QComboBox
 
     @dataclass
     class ViewMenu:
@@ -199,7 +200,15 @@ class MainWindow(QMainWindow):
         pass
 
     def init_insert_menu(self) -> None:
-        pass
+        self.insert_menu = self.InsertMenu(
+            mesh_label = self.comp_widgets.findChild(QLabel, "mesh_label"),
+            mesh_combo = self.comp_widgets.findChild(QComboBox, "mesh_combo"),
+        )
+
+        self.sidebar.addWidget(self.insert_menu.mesh_label)
+        self.sidebar.addWidget(self.insert_menu.mesh_combo)
+
+        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
 
     def init_view_menu(self) -> None:
         if self.comp_widgets is None or self.sidebar is None:
@@ -282,7 +291,8 @@ class MainWindow(QMainWindow):
         pass
 
     def show_insert(self) -> None:
-        pass
+        self.insert_menu.mesh_label.show()
+        self.insert_menu.mesh_combo.show()
 
     def show_view(self) -> None:
         self.view_menu.ray_tracing_label.show()
@@ -353,6 +363,12 @@ class MainWindow(QMainWindow):
             self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
         else:
             self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
+        self.update_display()
+
+    def insert_mesh(self,index:int) ->None:
+        """event handler for self.insert_menu.mesh_combo"""
+        print("insert_mesh")
+        print(index)
         self.update_display()
 
     def update_display(self) -> None:
