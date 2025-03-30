@@ -201,10 +201,10 @@ class MainWindow(QMainWindow):
 
     def init_insert_menu(self) -> None:
         self.insert_menu = self.InsertMenu(
-            mesh_label = self.comp_widgets.findChild(QLabel, "mesh_label"),
-            mesh_combo = self.comp_widgets.findChild(QComboBox, "mesh_combo"),
+            mesh_label=self.comp_widgets.findChild(QLabel, "mesh_label"),
+            mesh_combo=self.comp_widgets.findChild(QComboBox, "mesh_combo"),
         )
-        
+
         self.sidebar.addWidget(self.insert_menu.mesh_label)
         self.sidebar.addWidget(self.insert_menu.mesh_combo)
 
@@ -365,26 +365,31 @@ class MainWindow(QMainWindow):
             self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
         self.update_display()
 
-    def insert_mesh(self,index:int) ->None:
+    def insert_mesh(self, index: int) -> None:
         """event handler for self.insert_menu.mesh_combo"""
-        print("insert_mesh")
-        print(index)
-        self.update_display(index=index)
+        """Depending on the index selected a new mesh is added to the plot"""
 
-    def update_display(self, **kwargs) -> None:
-        index = kwargs.get('index',None)
+        if index == 0:
+            self.meshes.add_mesh(
+                [(50, 50, 50), (70, 40, 50), (50, 40, 80), (80, 70, 50)],
+                [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
+                [1, 0, 1],
+            )
+        elif index == 1:
+            self.meshes.add_mesh(
+                [(50, 50, 50), (60, 30, 40), (60, 50, 90), (70, 50, 80)],
+                [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
+                [0, 1, 1],
+            )
+        self.update_display()
+
+    def update_display(self) -> None:
         if not self.have_working_file or self.display is None:
             return
         dimensions: view_types.Display = view_types.Display(
             width=np.int64(self.display.size().width()),
             height=np.int64(self.display.size().height()),
         )
-
-        """Depending on the index selected a new mesh is added to the plot"""
-        if index ==0:
-            self.meshes.add_mesh([(50,50,50),(70,40,50),(50,40,80),(80,70,50)], [(0,1,2),(2,1,3),(1,0,3)],[1,0,1])
-        if index == 1:
-            self.meshes.add_mesh([(50,50,50),(60,30,40),(60,50,90),(70,50,80)],[(0,1,2),(2,1,3),(1,0,3)],[0,1,1])
 
         raster: view_types.Raster = self.viewer.render(dimensions, self.meshes)
         image: QImage = QImage(
