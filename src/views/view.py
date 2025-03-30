@@ -26,8 +26,8 @@ class Viewer:
     def __init__(self, cam: camera.Camera | None = None):
         self.cam = camera.Camera()
 
-        self.cam.set_position(np.array([0.5, 0.5, -3], dtype=np.float64))
-        self.cam.set_focal_point(np.array([0.5, 0.5, 0.5], dtype=np.float64))
+        self.cam.set_position(np.array([0, 0, -10], dtype=np.float64))
+        self.cam.set_focal_point(np.array([50, 40, 50], dtype=np.float64))
 
     def render(
         self,
