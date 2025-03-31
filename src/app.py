@@ -423,9 +423,14 @@ class MainWindow(QMainWindow):
 
     def update_insert(self):
         #self.insert_menu.mesh_combo.clear()
-        if self.insert_menu.new_mesh_text.toPlainText() == "":
+        if self.insert_menu.new_vertices_text.toPlainText() == "" or self.insert_menu.new_faces_text.toPlainText() == "" or self.insert_menu.new_color_text.toPlainText() == "" :
             return
-        print(self.insert_menu.new_mesh_text.toPlainText())
+        vertices = self.insert_menu.new_vertices_text.toPlainText()
+        faces = self.insert_menu.new_faces_text.toPlainText()
+        color = self.insert_menu.new_color_text.toPlainText()
+
+        self.meshes.add_mesh(vertices,faces,color)
+
         for key in self.meshes.meshes:
             self.insert_menu.mesh_combo.addItem(key)
         self.insert_menu.mesh_combo.setCurrentIndex(-1)
