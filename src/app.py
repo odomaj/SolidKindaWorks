@@ -56,8 +56,14 @@ class MainWindow(QMainWindow):
     class InsertMenu:
         mesh_label: QLabel
         mesh_combo: QComboBox
+        vertices_label : QLabel
+        new_vertices_text: QPlainTextEdit
+        faces_label: QLabel
+        new_faces_text: QPlainTextEdit
+        color_label: QLabel
+        new_color_text: QPlainTextEdit
         add_new_mesh: QPushButton
-        new_mesh_text: QPlainTextEdit
+        
 
     @dataclass
     class ViewMenu:
@@ -205,18 +211,33 @@ class MainWindow(QMainWindow):
         self.insert_menu = self.InsertMenu(
             mesh_label=self.comp_widgets.findChild(QLabel, "mesh_label"),
             mesh_combo=self.comp_widgets.findChild(QComboBox, "mesh_combo"),
+            vertices_label=self.comp_widgets.findChild(QLabel,"vertices_label"),
+            new_vertices_text=self.comp_widgets.findChild(QPlainTextEdit, "new_vertices_text"),
+            faces_label=self.comp_widgets.findChild(QLabel,"faces_label"),
+            new_faces_text=self.comp_widgets.findChild(QPlainTextEdit, "new_faces_text"),
+            color_label=self.comp_widgets.findChild(QLabel,"color_label"),
+            new_color_text=self.comp_widgets.findChild(QPlainTextEdit, "new_color_text"),
             add_new_mesh=self.comp_widgets.findChild(QPushButton, "add_new_mesh"),
-            new_mesh_text=self.comp_widgets.findChild(QPlainTextEdit, "new_mesh_text"),
+            
         )
 
         self.insert_menu.mesh_combo.setCurrentIndex(-1)
         self.insert_menu.mesh_combo.setPlaceholderText("Select Mesh")
 
+        self.insert_menu.new_vertices_text.setPlaceholderText("[(x,y,z),...] format")
+        self.insert_menu.new_faces_text.setPlaceholderText("[(v1,v2,v3),...] format")
+        self.insert_menu.new_color_text.setPlaceholderText("[R,G,B] 0-255 format")
+
         self.sidebar.addWidget(self.insert_menu.mesh_label)
         self.sidebar.addWidget(self.insert_menu.mesh_combo)
+        self.sidebar.addWidget(self.insert_menu.vertices_label)
+        self.sidebar.addWidget(self.insert_menu.new_vertices_text)
+        self.sidebar.addWidget(self.insert_menu.faces_label)
+        self.sidebar.addWidget(self.insert_menu.new_faces_text)
+        self.sidebar.addWidget(self.insert_menu.color_label)
+        self.sidebar.addWidget(self.insert_menu.new_color_text)
         self.sidebar.addWidget(self.insert_menu.add_new_mesh)
-        self.sidebar.addWidget(self.insert_menu.new_mesh_text)
-
+       
         self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
         self.insert_menu.add_new_mesh.clicked.connect(self.update_insert)
 
@@ -303,8 +324,13 @@ class MainWindow(QMainWindow):
     def show_insert(self) -> None:
         self.insert_menu.mesh_label.show()
         self.insert_menu.mesh_combo.show()
+        self.insert_menu.vertices_label.show()
+        self.insert_menu.new_vertices_text.show()
+        self.insert_menu.faces_label.show()
+        self.insert_menu.new_faces_text.show()
+        self.insert_menu.color_label.show()
+        self.insert_menu.new_color_text.show()
         self.insert_menu.add_new_mesh.show()
-        self.insert_menu.new_mesh_text.show()
 
     def show_view(self) -> None:
         self.view_menu.ray_tracing_label.show()
@@ -397,6 +423,9 @@ class MainWindow(QMainWindow):
 
     def update_insert(self):
         #self.insert_menu.mesh_combo.clear()
+        if self.insert_menu.new_mesh_text.toPlainText() == "":
+            return
+        print(self.insert_menu.new_mesh_text.toPlainText())
         for key in self.meshes.meshes:
             self.insert_menu.mesh_combo.addItem(key)
         self.insert_menu.mesh_combo.setCurrentIndex(-1)

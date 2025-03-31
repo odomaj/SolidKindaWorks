@@ -135,16 +135,43 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="add_new_mesh">
+     <widget class="QLabel" name="vertices_label">
       <property name="text">
-       <string>New Mesh</string>
+       <string>Verticecs:</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="new_mesh_text"/>
+     <widget class="QPlainTextEdit" name="new_vertices_text"/>
     </item>
-    </layout>
+    <item>
+     <widget class="QLabel" name="faces_label">
+      <property name="text">
+       <string>Faces:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="new_faces_text"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="color_label">
+      <property name="text">
+       <string>Color:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="new_color_text"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="add_new_mesh">
+      <property name="text">
+       <string>Submit Mesh</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
