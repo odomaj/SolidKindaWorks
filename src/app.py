@@ -209,12 +209,16 @@ class MainWindow(QMainWindow):
             new_mesh_text=self.comp_widgets.findChild(QPlainTextEdit, "new_mesh_text"),
         )
 
+        self.insert_menu.mesh_combo.setCurrentIndex(-1)
+        self.insert_menu.mesh_combo.setPlaceholderText("Select Mesh")
+
         self.sidebar.addWidget(self.insert_menu.mesh_label)
         self.sidebar.addWidget(self.insert_menu.mesh_combo)
         self.sidebar.addWidget(self.insert_menu.add_new_mesh)
         self.sidebar.addWidget(self.insert_menu.new_mesh_text)
 
         self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
+        self.insert_menu.add_new_mesh.clicked.connect(self.update_insert)
 
     def init_view_menu(self) -> None:
         if self.comp_widgets is None or self.sidebar is None:
@@ -390,6 +394,13 @@ class MainWindow(QMainWindow):
                 [0, 1, 1],
             )
         self.update_display()
+
+    def update_insert(self):
+        #self.insert_menu.mesh_combo.clear()
+        for key in self.meshes.meshes:
+            self.insert_menu.mesh_combo.addItem(key)
+        self.insert_menu.mesh_combo.setCurrentIndex(-1)
+
 
     def update_display(self) -> None:
         if not self.have_working_file or self.display is None:
