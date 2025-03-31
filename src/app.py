@@ -56,6 +56,8 @@ class MainWindow(QMainWindow):
     class InsertMenu:
         mesh_label: QLabel
         mesh_combo: QComboBox
+        add_new_mesh: QPushButton
+        new_mesh_text: QPlainTextEdit
 
     @dataclass
     class ViewMenu:
@@ -203,10 +205,14 @@ class MainWindow(QMainWindow):
         self.insert_menu = self.InsertMenu(
             mesh_label=self.comp_widgets.findChild(QLabel, "mesh_label"),
             mesh_combo=self.comp_widgets.findChild(QComboBox, "mesh_combo"),
+            add_new_mesh=self.comp_widgets.findChild(QPushButton, "add_new_mesh"),
+            new_mesh_text=self.comp_widgets.findChild(QPlainTextEdit, "new_mesh_text"),
         )
 
         self.sidebar.addWidget(self.insert_menu.mesh_label)
         self.sidebar.addWidget(self.insert_menu.mesh_combo)
+        self.sidebar.addWidget(self.insert_menu.add_new_mesh)
+        self.sidebar.addWidget(self.insert_menu.new_mesh_text)
 
         self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
 
@@ -293,6 +299,8 @@ class MainWindow(QMainWindow):
     def show_insert(self) -> None:
         self.insert_menu.mesh_label.show()
         self.insert_menu.mesh_combo.show()
+        self.insert_menu.add_new_mesh.show()
+        self.insert_menu.new_mesh_text.show()
 
     def show_view(self) -> None:
         self.view_menu.ray_tracing_label.show()

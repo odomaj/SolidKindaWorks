@@ -134,6 +134,16 @@
       </item>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="add_new_mesh">
+      <property name="text">
+       <string>New Mesh</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="new_mesh_text"/>
+    </item>
     </layout>
   </widget>
  </widget>
