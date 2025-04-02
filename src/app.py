@@ -601,8 +601,10 @@ class MainWindow(QMainWindow):
         else:
             mesh = (self.meshes.meshes[key])
             vertcies = mesh.vertices
-            faces = mesh.faces
-            self.meshes.add_mesh(vertcies,faces,[0,1,0])
+            faces = mesh.cells
+            color = mesh.color
+            self.meshes.add_mesh(vertcies,faces,color,)
+            
     
         self.update_display()
 
@@ -618,11 +620,19 @@ class MainWindow(QMainWindow):
         print(faces)
         print(color)
 
-        self.meshes.add_mesh(vertices,faces,color,)
+        verticesList = eval(vertices)
+        #print(type(verticesList))
+        #print(verticesList)
+        facesList = eval(faces)
+        colorList = eval(color)
+
+        self.meshes.add_mesh(verticesList,facesList,colorList,)
 
         for key in self.meshes.meshes:
             self.insert_menu.mesh_combo.addItem(key)
         self.insert_menu.mesh_combo.setCurrentIndex(-1)
+        
+        self.update_display()
 
 
     def update_display(self) -> None:
