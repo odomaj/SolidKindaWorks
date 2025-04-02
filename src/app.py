@@ -271,8 +271,8 @@ class MainWindow(QMainWindow):
             zoom_in_text=zoom_in_text,
             zoom_out_text=zoom_out_text,
         )
-        self.sidebar.addLayout(self.home_menu.rotate_down)
         self.sidebar.addLayout(self.home_menu.rotate_up)
+        self.sidebar.addLayout(self.home_menu.rotate_down)
         self.sidebar.addLayout(self.home_menu.rotate_left)
         self.sidebar.addLayout(self.home_menu.rotate_right)
         self.sidebar.addLayout(self.home_menu.zoom_in)
@@ -284,12 +284,19 @@ class MainWindow(QMainWindow):
         self.home_menu.rotate_down.addWidget(self.home_menu.rotate_down_text)
         self.home_menu.rotate_left.addWidget(self.home_menu.rotate_left_button)
         self.home_menu.rotate_left.addWidget(self.home_menu.rotate_left_text)
-        self.home_menu.rotate_down.addWidget(self.home_menu.rotate_down_button)
-        self.home_menu.rotate_down.addWidget(self.home_menu.rotate_down_text)
+        self.home_menu.rotate_right.addWidget(self.home_menu.rotate_right_button)
+        self.home_menu.rotate_right.addWidget(self.home_menu.rotate_right_text)
         self.home_menu.zoom_in.addWidget(self.home_menu.zoom_in_button)
         self.home_menu.zoom_in.addWidget(self.home_menu.zoom_in_text)
         self.home_menu.zoom_out.addWidget(self.home_menu.zoom_out_button)
         self.home_menu.zoom_out.addWidget(self.home_menu.zoom_out_text)
+
+        self.home_menu.rotate_up_button.clicked.connect(self.home_rotate_up)
+        self.home_menu.rotate_down_button.clicked.connect(self.home_rotate_down)
+        self.home_menu.rotate_left_button.clicked.connect(self.home_rotate_left)
+        self.home_menu.rotate_right_button.clicked.connect(self.home_rotate_right)
+        self.home_menu.zoom_in_button.clicked.connect(self.home_zoom_in)
+        self.home_menu.zoom_out_button.clicked.connect(self.home_zoom_out)
 
     def init_insert_menu(self) -> None:
         self.insert_menu = self.InsertMenu(
@@ -472,6 +479,66 @@ class MainWindow(QMainWindow):
             self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
         else:
             self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
+        self.update_display()
+
+    def home_rotate_up(self) -> None:
+        """event handler for self.home_menu.rotate_up_button"""
+        try:
+            self.viewer.rotate_cam(
+                np.float64(self.home_menu.rotate_up_text.toPlainText()),
+                np.float64(0.0),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_rotate_down(self) -> None:
+        """event handler for self.home_menu.rotate_down_button"""
+        try:
+            self.viewer.rotate_cam(
+                -1 * np.float64(self.home_menu.rotate_down_text.toPlainText()),
+                np.float64(0.0),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_rotate_left(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.rotate_cam(
+                np.float64(0.0),
+                -1 * np.float64(self.home_menu.rotate_left_text.toPlainText()),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_rotate_right(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.rotate_cam(
+                np.float64(0.0),
+                np.float64(self.home_menu.rotate_right_text.toPlainText()),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_zoom_in(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.zoom_cam(-1 * np.float64(self.home_menu.zoom_in_text.toPlainText()))
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_zoom_out(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.zoom_cam(np.float64(self.home_menu.zoom_out_text.toPlainText()))
+        except Exception as e:
+            print(e)
         self.update_display()
 
     def insert_mesh(self, index: int) -> None:
