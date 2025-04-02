@@ -228,16 +228,16 @@
     </item>
     <item>
      <widget class="QComboBox" name="mesh_combo">
-      <item>
-       <property name="text">
-        <string>Sample Mesh 1</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Sample Mesh 2</string>
-       </property>
-      </item>
+     <item>
+        <property name = "text">
+            <string>Sample 1</string>
+        </property>
+     </item>
+     <item>
+        <property name = "text">
+            <string>Sample 2</string>
+        </property>
+     </item>
      </widget>
     </item>
     <item>

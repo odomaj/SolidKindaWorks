@@ -323,6 +323,7 @@ class MainWindow(QMainWindow):
         self.insert_menu.mesh_combo.setCurrentIndex(-1)
         self.insert_menu.mesh_combo.setPlaceholderText("Select Mesh")
 
+        
         self.insert_menu.new_vertices_text.setPlaceholderText("[(x,y,z),...] format")
         self.insert_menu.new_faces_text.setPlaceholderText("[(v1,v2,v3),...] format")
         self.insert_menu.new_color_text.setPlaceholderText("[R,G,B] 0-255 format")
@@ -583,23 +584,26 @@ class MainWindow(QMainWindow):
         """event handler for self.insert_menu.mesh_combo"""
         """Depending on the index selected a new mesh is added to the plot"""
 
-        #key = self.insert_menu.mesh_combo.itemText(index)
-        #self.meshes.add_mesh(self.meshes.meshes[key])
+        key = self.insert_menu.mesh_combo.itemText(index)
 
-        
-        if index == 0:
+        if key == 'Sample 1':
             self.meshes.add_mesh(
                 [(50, 50, 50), (70, 40, 50), (50, 40, 80), (80, 70, 50)],
                 [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
                 [1, 0, 1],
             )
-        elif index == 1:
+        elif key == 'Sample 2':
             self.meshes.add_mesh(
                 [(50, 50, 50), (60, 30, 40), (60, 50, 90), (70, 50, 80)],
                 [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
                 [0, 1, 1],
             )
-            
+        else:
+            mesh = (self.meshes.meshes[key])
+            vertcies = mesh.vertices
+            faces = mesh.faces
+            self.meshes.add_mesh(vertcies,faces,[0,1,0])
+    
         self.update_display()
 
     def update_insert(self):
@@ -610,7 +614,11 @@ class MainWindow(QMainWindow):
         faces = self.insert_menu.new_faces_text.toPlainText()
         color = self.insert_menu.new_color_text.toPlainText()
 
-        self.meshes.add_mesh(vertices,faces,color)
+        print(vertices)
+        print(faces)
+        print(color)
+
+        self.meshes.add_mesh(vertices,faces,color,)
 
         for key in self.meshes.meshes:
             self.insert_menu.mesh_combo.addItem(key)
