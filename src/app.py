@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QVBoxLayout,
+    QHBoxLayout,
     QWidget,
     QComboBox,
     QPlainTextEdit,
@@ -50,7 +51,24 @@ class MainWindow(QMainWindow):
 
     @dataclass
     class HomeMenu:
-        pass
+        rotate_up: QHBoxLayout
+        rotate_down: QHBoxLayout
+        rotate_left: QHBoxLayout
+        rotate_right: QHBoxLayout
+        zoom_in: QHBoxLayout
+        zoom_out: QHBoxLayout
+        rotate_up_button: QPushButton
+        rotate_down_button: QPushButton
+        rotate_left_button: QPushButton
+        rotate_right_button: QPushButton
+        zoom_in_button: QPushButton
+        zoom_out_button: QPushButton
+        rotate_up_text: QPlainTextEdit
+        rotate_down_text: QPlainTextEdit
+        rotate_left_text: QPlainTextEdit
+        rotate_right_text: QPlainTextEdit
+        zoom_in_text: QPlainTextEdit
+        zoom_out_text: QPlainTextEdit
 
     @dataclass
     class InsertMenu:
@@ -205,7 +223,88 @@ class MainWindow(QMainWindow):
         self.file_menu.save_as_button.clicked.connect(self.file_save_as)
 
     def init_home_menu(self) -> None:
-        pass
+        if self.comp_widgets is None or self.sidebar is None:
+            return
+        rotate_up = QHBoxLayout()
+        rotate_down = QHBoxLayout()
+        rotate_left = QHBoxLayout()
+        rotate_right = QHBoxLayout()
+        zoom_in = QHBoxLayout()
+        zoom_out = QHBoxLayout()
+        rotate_up_button = self.comp_widgets.findChild(QPushButton, "rotate_up_button")
+        rotate_down_button = self.comp_widgets.findChild(QPushButton, "rotate_down_button")
+        rotate_left_button = self.comp_widgets.findChild(QPushButton, "rotate_left_button")
+        rotate_right_button = self.comp_widgets.findChild(QPushButton, "rotate_right_button")
+        zoom_in_button = self.comp_widgets.findChild(QPushButton, "zoom_in_button")
+        zoom_out_button = self.comp_widgets.findChild(QPushButton, "zoom_out_button")
+        rotate_up_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_up_text")
+        rotate_down_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_down_text")
+        rotate_left_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_left_text")
+        rotate_right_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_right_text")
+        zoom_in_text = self.comp_widgets.findChild(QPlainTextEdit, "zoom_in_text")
+        zoom_out_text = self.comp_widgets.findChild(QPlainTextEdit, "zoom_out_text")
+        if (
+            rotate_up_button is None
+            or rotate_down_button is None
+            or rotate_left_button is None
+            or rotate_right_button is None
+            or zoom_in_button is None
+            or zoom_out_button is None
+            or rotate_up_text is None
+            or rotate_down_text is None
+            or rotate_left_text is None
+            or rotate_right_text is None
+            or zoom_in_text is None
+            or zoom_out_text is None
+        ):
+            print("[ERROR] home menu failed to load")
+            return
+        self.home_menu = self.HomeMenu(
+            rotate_up=rotate_up,
+            rotate_down=rotate_down,
+            rotate_left=rotate_left,
+            rotate_right=rotate_right,
+            zoom_in=zoom_in,
+            zoom_out=zoom_out,
+            rotate_up_button=rotate_up_button,
+            rotate_down_button=rotate_down_button,
+            rotate_left_button=rotate_left_button,
+            rotate_right_button=rotate_right_button,
+            zoom_in_button=zoom_in_button,
+            zoom_out_button=zoom_out_button,
+            rotate_up_text=rotate_up_text,
+            rotate_down_text=rotate_down_text,
+            rotate_left_text=rotate_left_text,
+            rotate_right_text=rotate_right_text,
+            zoom_in_text=zoom_in_text,
+            zoom_out_text=zoom_out_text,
+        )
+        self.sidebar.addLayout(self.home_menu.rotate_up)
+        self.sidebar.addLayout(self.home_menu.rotate_down)
+        self.sidebar.addLayout(self.home_menu.rotate_left)
+        self.sidebar.addLayout(self.home_menu.rotate_right)
+        self.sidebar.addLayout(self.home_menu.zoom_in)
+        self.sidebar.addLayout(self.home_menu.zoom_out)
+
+        self.home_menu.rotate_up.addWidget(self.home_menu.rotate_up_button)
+        self.home_menu.rotate_up.addWidget(self.home_menu.rotate_up_text)
+        self.home_menu.rotate_down.addWidget(self.home_menu.rotate_down_button)
+        self.home_menu.rotate_down.addWidget(self.home_menu.rotate_down_text)
+        self.home_menu.rotate_left.addWidget(self.home_menu.rotate_left_button)
+        self.home_menu.rotate_left.addWidget(self.home_menu.rotate_left_text)
+        self.home_menu.rotate_right.addWidget(self.home_menu.rotate_right_button)
+        self.home_menu.rotate_right.addWidget(self.home_menu.rotate_right_text)
+        self.home_menu.zoom_in.addWidget(self.home_menu.zoom_in_button)
+        self.home_menu.zoom_in.addWidget(self.home_menu.zoom_in_text)
+        self.home_menu.zoom_out.addWidget(self.home_menu.zoom_out_button)
+        self.home_menu.zoom_out.addWidget(self.home_menu.zoom_out_text)
+
+        self.home_menu.rotate_up_button.clicked.connect(self.home_rotate_up)
+        self.home_menu.rotate_down_button.clicked.connect(self.home_rotate_down)
+        self.home_menu.rotate_left_button.clicked.connect(self.home_rotate_left)
+        self.home_menu.rotate_right_button.clicked.connect(self.home_rotate_right)
+        self.home_menu.zoom_in_button.clicked.connect(self.home_zoom_in)
+        self.home_menu.zoom_out_button.clicked.connect(self.home_zoom_out)
 
     def init_insert_menu(self) -> None:
         self.insert_menu = self.InsertMenu(
@@ -308,7 +407,13 @@ class MainWindow(QMainWindow):
         if self.sidebar is None:
             return
         for i in range(self.sidebar.count()):
-            self.sidebar.itemAt(i).widget().hide()
+            item = self.sidebar.itemAt(i)
+            if item.widget() is not None:
+                item.widget().hide()
+            elif item.layout() is not None:
+                for j in range(item.layout().count()):
+                    if item.layout().itemAt(j).widget is not None:
+                        item.layout().itemAt(j).widget().hide()
 
     def show_file(self) -> None:
         self.file_menu.new_button.show()
@@ -319,7 +424,18 @@ class MainWindow(QMainWindow):
         self.file_menu.save_as_text.show()
 
     def show_home(self) -> None:
-        pass
+        self.home_menu.rotate_up_button.show()
+        self.home_menu.rotate_up_text.show()
+        self.home_menu.rotate_down_button.show()
+        self.home_menu.rotate_down_text.show()
+        self.home_menu.rotate_left_button.show()
+        self.home_menu.rotate_left_text.show()
+        self.home_menu.rotate_right_button.show()
+        self.home_menu.rotate_right_text.show()
+        self.home_menu.zoom_in_button.show()
+        self.home_menu.zoom_in_text.show()
+        self.home_menu.zoom_out_button.show()
+        self.home_menu.zoom_out_text.show()
 
     def show_insert(self) -> None:
         self.insert_menu.mesh_label.show()
@@ -401,6 +517,66 @@ class MainWindow(QMainWindow):
             self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
         else:
             self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
+        self.update_display()
+
+    def home_rotate_up(self) -> None:
+        """event handler for self.home_menu.rotate_up_button"""
+        try:
+            self.viewer.rotate_cam(
+                np.float64(self.home_menu.rotate_up_text.toPlainText()),
+                np.float64(0.0),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_rotate_down(self) -> None:
+        """event handler for self.home_menu.rotate_down_button"""
+        try:
+            self.viewer.rotate_cam(
+                -1 * np.float64(self.home_menu.rotate_down_text.toPlainText()),
+                np.float64(0.0),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_rotate_left(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.rotate_cam(
+                np.float64(0.0),
+                -1 * np.float64(self.home_menu.rotate_left_text.toPlainText()),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_rotate_right(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.rotate_cam(
+                np.float64(0.0),
+                np.float64(self.home_menu.rotate_right_text.toPlainText()),
+            )
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_zoom_in(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.zoom_cam(-1 * np.float64(self.home_menu.zoom_in_text.toPlainText()))
+        except Exception as e:
+            print(e)
+        self.update_display()
+
+    def home_zoom_out(self) -> None:
+        """event handler for self.home_menu.rotate_left_button"""
+        try:
+            self.viewer.zoom_cam(np.float64(self.home_menu.zoom_out_text.toPlainText()))
+        except Exception as e:
+            print(e)
         self.update_display()
 
     def insert_mesh(self, index: int) -> None:

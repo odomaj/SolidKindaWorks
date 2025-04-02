@@ -39,3 +39,59 @@ class Viewer:
         if self.render_mode == self.Rendering.RAY_TRACE:
             return ray_trace.render(display, meshes, self.cam)
         return np.random.randint(0, 255, size=(display.width, display.height, 3), dtype=np.uint8)
+
+    def rotate_cam(self, vert: np.float64, hori: np.float64) -> None:
+        vert = np.deg2rad(vert)
+        hori = np.degrees(hori)
+
+        cam_coords = self.cam.get_position()
+        if cam_coords is None:
+            return
+        focal_point = self.cam.get_focal_point()
+        if focal_point is not None:
+            cam_coords -= focal_point
+
+        cv = np.cos(vert)
+        sv = np.sin(vert)
+        vert_rot = np.array(
+            [
+                [cv, 0, sv],
+                [0, 1, 0],
+                [-sv, 0, cv],
+            ],
+            dtype=np.float64,
+        )
+
+        cam_coords = np.dot(vert_rot, cam_coords)
+
+        ch = np.cos(hori)
+        sh = np.sin(hori)
+        hori_rot = np.array(
+            [
+                [ch, sh, 0],
+                [-sh, ch, 0],
+                [0, 0, 1],
+            ],
+            dtype=np.float64,
+        )
+
+        cam_coords = np.dot(hori_rot, cam_coords)
+
+        if focal_point is not None:
+            cam_coords += focal_point
+        self.cam.set_position(cam_coords)
+
+    def zoom_cam(self, factor: np.float64) -> None:
+        factor = 1 + factor / 100
+        cam_coords = self.cam.get_position()
+        if cam_coords is None:
+            return
+        focal_point = self.cam.get_focal_point()
+        if focal_point is not None:
+            cam_coords -= focal_point
+
+        cam_coords *= factor
+
+        if focal_point is not None:
+            cam_coords += focal_point
+        self.cam.set_position(cam_coords)
