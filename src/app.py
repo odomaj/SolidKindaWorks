@@ -407,6 +407,10 @@ class MainWindow(QMainWindow):
         """event handler for self.insert_menu.mesh_combo"""
         """Depending on the index selected a new mesh is added to the plot"""
 
+        #key = self.insert_menu.mesh_combo.itemText(index)
+        #self.meshes.add_mesh(self.meshes.meshes[key])
+
+        
         if index == 0:
             self.meshes.add_mesh(
                 [(50, 50, 50), (70, 40, 50), (50, 40, 80), (80, 70, 50)],
@@ -419,6 +423,7 @@ class MainWindow(QMainWindow):
                 [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
                 [0, 1, 1],
             )
+            
         self.update_display()
 
     def update_insert(self):
