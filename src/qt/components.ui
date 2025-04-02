@@ -218,7 +218,7 @@
      <height>47</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="Insert">
+    <layout class="QVBoxLayout" name="Insert"> 
     <item>
      <widget class="QLabel" name="mesh_label">
       <property name="text">
@@ -238,6 +238,43 @@
         <string>Sample Mesh 2</string>
        </property>
       </item>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="vertices_label">
+      <property name="text">
+       <string>Verticecs:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="new_vertices_text"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="faces_label">
+      <property name="text">
+       <string>Faces:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="new_faces_text"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="color_label">
+      <property name="text">
+       <string>Color:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="new_color_text"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="add_new_mesh">
+      <property name="text">
+       <string>Submit Mesh</string>
+      </property>
      </widget>
     </item>
    </layout>
