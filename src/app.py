@@ -602,7 +602,7 @@ class MainWindow(QMainWindow):
             mesh = (self.meshes.meshes[key])
             vertcies = mesh.vertices
             faces = mesh.cells
-            color = mesh.color
+            color = mesh.color()
             self.meshes.add_mesh(vertcies,faces,color,)
             
     
