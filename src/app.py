@@ -335,8 +335,8 @@ class MainWindow(QMainWindow):
         self.sidebar.addWidget(self.insert_menu.new_color_text)
         self.sidebar.addWidget(self.insert_menu.add_new_mesh)
 
-        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
-        self.insert_menu.add_new_mesh.clicked.connect(self.update_insert)
+        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_insert_mesh)
+        self.insert_menu.add_new_mesh.clicked.connect(self.insert_add_new)
 
     def init_view_menu(self) -> None:
         if self.comp_widgets is None or self.sidebar is None:
@@ -577,7 +577,7 @@ class MainWindow(QMainWindow):
             print(e)
         self.update_display()
 
-    def insert_mesh(self, index: int) -> None:
+    def insert_insert_mesh(self, index: int) -> None:
         """event handler for self.insert_menu.mesh_combo"""
         """Depending on the index selected a new mesh is added to the plot"""
 
@@ -608,8 +608,7 @@ class MainWindow(QMainWindow):
 
         self.update_display()
 
-    def update_insert(self):
-        # self.insert_menu.mesh_combo.clear()
+    def insert_add_new(self):
         if (
             self.insert_menu.new_vertices_text.toPlainText() == ""
             or self.insert_menu.new_faces_text.toPlainText() == ""
@@ -620,13 +619,7 @@ class MainWindow(QMainWindow):
         faces = self.insert_menu.new_faces_text.toPlainText()
         color = self.insert_menu.new_color_text.toPlainText()
 
-        print(vertices)
-        print(faces)
-        print(color)
-
         verticesList = eval(vertices)
-        # print(type(verticesList))
-        # print(verticesList)
         facesList = eval(faces)
         colorList = eval(color)
 
