@@ -74,6 +74,13 @@ class MainWindow(QMainWindow):
     class InsertMenu:
         mesh_label: QLabel
         mesh_combo: QComboBox
+        vertices_label: QLabel
+        new_vertices_text: QPlainTextEdit
+        faces_label: QLabel
+        new_faces_text: QPlainTextEdit
+        color_label: QLabel
+        new_color_text: QPlainTextEdit
+        add_new_mesh: QPushButton
 
     @dataclass
     class ViewMenu:
@@ -302,12 +309,34 @@ class MainWindow(QMainWindow):
         self.insert_menu = self.InsertMenu(
             mesh_label=self.comp_widgets.findChild(QLabel, "mesh_label"),
             mesh_combo=self.comp_widgets.findChild(QComboBox, "mesh_combo"),
+            vertices_label=self.comp_widgets.findChild(QLabel, "vertices_label"),
+            new_vertices_text=self.comp_widgets.findChild(QPlainTextEdit, "new_vertices_text"),
+            faces_label=self.comp_widgets.findChild(QLabel, "faces_label"),
+            new_faces_text=self.comp_widgets.findChild(QPlainTextEdit, "new_faces_text"),
+            color_label=self.comp_widgets.findChild(QLabel, "color_label"),
+            new_color_text=self.comp_widgets.findChild(QPlainTextEdit, "new_color_text"),
+            add_new_mesh=self.comp_widgets.findChild(QPushButton, "add_new_mesh"),
         )
+
+        self.insert_menu.mesh_combo.setCurrentIndex(-1)
+        self.insert_menu.mesh_combo.setPlaceholderText("Select Mesh")
+
+        self.insert_menu.new_vertices_text.setPlaceholderText("[(x,y,z),...] format")
+        self.insert_menu.new_faces_text.setPlaceholderText("[(v1,v2,v3),...] format")
+        self.insert_menu.new_color_text.setPlaceholderText("[R,G,B] 0-255 format")
 
         self.sidebar.addWidget(self.insert_menu.mesh_label)
         self.sidebar.addWidget(self.insert_menu.mesh_combo)
+        self.sidebar.addWidget(self.insert_menu.vertices_label)
+        self.sidebar.addWidget(self.insert_menu.new_vertices_text)
+        self.sidebar.addWidget(self.insert_menu.faces_label)
+        self.sidebar.addWidget(self.insert_menu.new_faces_text)
+        self.sidebar.addWidget(self.insert_menu.color_label)
+        self.sidebar.addWidget(self.insert_menu.new_color_text)
+        self.sidebar.addWidget(self.insert_menu.add_new_mesh)
 
-        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_mesh)
+        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_insert_mesh)
+        self.insert_menu.add_new_mesh.clicked.connect(self.insert_add_new)
 
     def init_view_menu(self) -> None:
         if self.comp_widgets is None or self.sidebar is None:
@@ -409,6 +438,13 @@ class MainWindow(QMainWindow):
     def show_insert(self) -> None:
         self.insert_menu.mesh_label.show()
         self.insert_menu.mesh_combo.show()
+        self.insert_menu.vertices_label.show()
+        self.insert_menu.new_vertices_text.show()
+        self.insert_menu.faces_label.show()
+        self.insert_menu.new_faces_text.show()
+        self.insert_menu.color_label.show()
+        self.insert_menu.new_color_text.show()
+        self.insert_menu.add_new_mesh.show()
 
     def show_view(self) -> None:
         self.view_menu.ray_tracing_label.show()
@@ -541,22 +577,62 @@ class MainWindow(QMainWindow):
             print(e)
         self.update_display()
 
-    def insert_mesh(self, index: int) -> None:
+    def insert_insert_mesh(self, index: int) -> None:
         """event handler for self.insert_menu.mesh_combo"""
         """Depending on the index selected a new mesh is added to the plot"""
 
-        if index == 0:
+        key = self.insert_menu.mesh_combo.itemText(index)
+
+        if key == "Sample 1":
             self.meshes.add_mesh(
                 [(50, 50, 50), (70, 40, 50), (50, 40, 80), (80, 70, 50)],
                 [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
                 [1, 0, 1],
             )
-        elif index == 1:
+        elif key == "Sample 2":
             self.meshes.add_mesh(
                 [(50, 50, 50), (60, 30, 40), (60, 50, 90), (70, 50, 80)],
                 [(0, 1, 2), (2, 1, 3), (1, 0, 3)],
                 [0, 1, 1],
             )
+        else:
+            mesh = self.meshes.meshes[key]
+            vertcies = mesh.vertices
+            faces = mesh.cells
+            color = mesh.color()
+            self.meshes.add_mesh(
+                vertcies,
+                faces,
+                color,
+            )
+
+        self.update_display()
+
+    def insert_add_new(self):
+        if (
+            self.insert_menu.new_vertices_text.toPlainText() == ""
+            or self.insert_menu.new_faces_text.toPlainText() == ""
+            or self.insert_menu.new_color_text.toPlainText() == ""
+        ):
+            return
+        vertices = self.insert_menu.new_vertices_text.toPlainText()
+        faces = self.insert_menu.new_faces_text.toPlainText()
+        color = self.insert_menu.new_color_text.toPlainText()
+
+        verticesList = eval(vertices)
+        facesList = eval(faces)
+        colorList = eval(color)
+
+        self.meshes.add_mesh(
+            verticesList,
+            facesList,
+            colorList,
+        )
+
+        for key in self.meshes.meshes:
+            self.insert_menu.mesh_combo.addItem(key)
+        self.insert_menu.mesh_combo.setCurrentIndex(-1)
+
         self.update_display()
 
     def update_display(self) -> None:
