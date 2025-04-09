@@ -511,10 +511,13 @@ class MainWindow(QMainWindow):
         """event handler for self.view_menu.projection_combo"""
         # orthographic = 0
         # perspective = 1
-        if index == 1:
-            self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
-        else:
-            self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
+
+        self.viewer.change_view_mode(index)
+
+        #if index == 1:
+            #self.viewer.view_mode = Viewer.Perspective.PERSPECTIVE
+        #else:
+            #self.viewer.view_mode = Viewer.Perspective.ORTHOGRAPHIC
         self.update_display()
 
     def home_rotate_up(self) -> None:

@@ -19,10 +19,19 @@ class Viewer:
         ORTHOGRAPHIC = 1
         PERSPECTIVE = 2
 
-    view_mode: Perspective = Perspective.ORTHOGRAPHIC
+    view_mode: Perspective = None
     render_mode: Rendering = Rendering.RASTERIZE
 
     cam: camera.Camera
+
+    def change_view_mode(self,newView):
+        print("in change view")
+        if newView == 1:
+            self.view_mode = self.Perspective.PERSPECTIVE
+            print("changed to perspective")
+        else:
+            self.view_mode = self.Perspective.ORTHOGRAPHIC
+            print("set to othro")
 
     def __init__(self, cam: camera.Camera | None = None):
         self.cam = camera.Camera()
@@ -79,7 +88,7 @@ class Viewer:
             [0,0,1,0]
             ])
   
-        vp_vertices = np.hstack((vertices,np.ones([8,1]))) #appending a 1 to the end of each point for proper sizing    
+        vp_vertices = np.hstack((vertices,np.ones([len(vertices),1]))) #appending a 1 to the end of each point for proper sizing    
         res_pts = vp_vertices @M.T
 
         if projection_type == "perspective":
@@ -98,7 +107,7 @@ class Viewer:
             [0,0,0,1]
         ])
 
-        vp_vertices = np.hstack((vertices,np.ones([8,1]))) #appending a 1 to the end of each point for proper sizing
+        vp_vertices = np.hstack((vertices,np.ones([len(vertices),1]))) #appending a 1 to the end of each point for proper sizing
         res_pts = Mvp @ vp_vertices.T #transposing the vertices so the matrix multiplication is correct
 
         res = res_pts[:2,:] #only getting points from the matrix
@@ -110,13 +119,35 @@ class Viewer:
         display: view_types.Display,
         meshes: Meshes,
     ) -> view_types.Raster:
-        if self.render_mode == self.Rendering.RASTERIZE:
-            return rasterize.render(display, meshes, self.cam)
-        if self.render_mode == self.Rendering.RAY_TRACE:
-            return ray_trace.render(display, meshes, self.cam)
+        
+        print(self.view_mode) #testing print
+
         if self.view_mode == self.Perspective.ORTHOGRAPHIC:
+            print("in ortho")
+            up = np.array([0,1,0])
+            gaze = self.cam.get_focal_point()
+            eye = self.cam.get_position()
+            
+            for key in meshes.meshes:
+                curmesh = meshes.meshes[key]
+                vertices = curmesh.vertices
+                faces = curmesh.cells
+                color = curmesh.color()
+
+                #camera transform
+                transformed_vertices = self.camera_transform(vertices,eye,gaze,up)
+
+                #projection transformation 
+                perspective_vertices = self.project_vertices(transformed_vertices,"orhtographic", near= 1, far=10)               
+
+                #viewport transformation
+                final_transform = self.viewport_transform(perspective_vertices, display.width,display.height)
+
+                curmesh = vedo.Mesh([final_transform,faces], c=vedo.colors.get_color(color))
             return rasterize.render(display,meshes,self.cam)
+        
         if self.view_mode == self.Perspective.PERSPECTIVE:
+            print("in perspective")
             up = np.array([0,1,0])
             gaze = self.cam.get_focal_point()
             eye = self.cam.get_position()
@@ -139,6 +170,12 @@ class Viewer:
                 curmesh = vedo.Mesh([final_transform,faces], c=vedo.colors.get_color(color))
 
             return rasterize.render(display,meshes,self.cam)
+        
+        if self.render_mode == self.Rendering.RASTERIZE:
+            print('rasterize')
+            return rasterize.render(display, meshes, self.cam)
+        if self.render_mode == self.Rendering.RAY_TRACE:
+            return ray_trace.render(display, meshes, self.cam)
         return np.random.randint(0, 255, size=(display.width, display.height, 3), dtype=np.uint8)
 
     def rotate_cam(self, vert: np.float64, hori: np.float64) -> None:
