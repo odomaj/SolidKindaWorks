@@ -24,6 +24,8 @@ class Viewer:
 
     cam: camera.Camera
 
+    updatedmeshes : Meshes = Meshes()
+
     def change_view_mode(self,newView):
         print("in change view")
         if newView == 1:
@@ -36,7 +38,7 @@ class Viewer:
     def __init__(self, cam: camera.Camera | None = None):
         self.cam = camera.Camera()
 
-        self.cam.set_position(np.array([0, 0, -10], dtype=np.float64))
+        self.cam.set_position(np.array([0, 0, 10], dtype=np.float64))
         self.cam.set_focal_point(np.array([50, 40, 50], dtype=np.float64))
 
     def camera_transform(self,vertices,eye,gaze,up):
@@ -143,7 +145,9 @@ class Viewer:
                 #viewport transformation
                 final_transform = self.viewport_transform(perspective_vertices, display.width,display.height)
 
-                curmesh = vedo.Mesh([final_transform,faces], c=vedo.colors.get_color(color))
+                curmesh.vertices = final_transform
+                curmesh.faces = faces
+                print(curmesh.vertices)
             return rasterize.render(display,meshes,self.cam)
         
         if self.view_mode == self.Perspective.PERSPECTIVE:
@@ -155,6 +159,7 @@ class Viewer:
             for key in meshes.meshes:
                 curmesh = meshes.meshes[key]
                 vertices = curmesh.vertices
+                print(vertices)
                 faces = curmesh.cells
                 color = curmesh.color()
 
@@ -167,7 +172,10 @@ class Viewer:
                 #viewport transformation
                 final_transform = self.viewport_transform(perspective_vertices, display.width,display.height)
 
-                curmesh = vedo.Mesh([final_transform,faces], c=vedo.colors.get_color(color))
+                #self.updatedmeshes.add_mesh(final_transform,faces,color)
+                curmesh.vertices = final_transform
+                curmesh.faces = faces
+                print(curmesh.vertices)
 
             return rasterize.render(display,meshes,self.cam)
         
