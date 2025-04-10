@@ -67,23 +67,18 @@ class Viewer:
         return vertices_homo[:,:3]
 
     # Projection Transformation
-    def project_vertices(self,vertices, projection_type, near=1, far=10):
+    def project_vertices(self,vertices, near=1, far=10):
     
         #assume r is 1 and l is -1
         r =1
         t =1
         l =-1
         b=-1
-        M = np.array([
-            [1/(r-l), 0,0, 0],
-            [0,1/(t-b),0,0],
-            [0,0,2/(near-far),-(near+far)/(far-near)],
-            [0,0,0,1]
-            ])
+        
 
-        if projection_type == "perspective":
-            #performs a perspective projection type
-            M = np.array([
+        
+        #performs a perspective projection type
+        M = np.array([
             [near,0,0,0],
             [0,near,0,0],
             [0,0,near + far, -near*far],
@@ -93,10 +88,10 @@ class Viewer:
         vp_vertices = np.hstack((vertices,np.ones([len(vertices),1]))) #appending a 1 to the end of each point for proper sizing    
         res_pts = vp_vertices @M.T
 
-        if projection_type == "perspective":
-            res_pts[:,0] = res_pts[:,0]/res_pts[:,3]
-            res_pts[:,1] = res_pts[:,1]/res_pts[:,3]
-            res_pts[:,2] = res_pts[:,2]/res_pts[:,3]
+        
+        res_pts[:,0] = res_pts[:,0]/res_pts[:,3]
+        res_pts[:,1] = res_pts[:,1]/res_pts[:,3]
+        res_pts[:,2] = res_pts[:,2]/res_pts[:,3]
 
         return res_pts[:,0:3]
     
@@ -147,7 +142,7 @@ class Viewer:
                 transformed_vertices = self.camera_transform(vertices,eye,gaze,up)
 
                 #projection transformation 
-                perspective_vertices = self.project_vertices(transformed_vertices,"perspective", near= 1, far=10)               
+                perspective_vertices = self.project_vertices(transformed_vertices, near= 1, far=10)               
 
                 #viewport transformation
                 final_transform = self.viewport_transform(perspective_vertices, display.width,display.height)
