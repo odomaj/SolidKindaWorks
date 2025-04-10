@@ -4,7 +4,7 @@ from mesh.mesh import Meshes
 from enum import Enum
 import numpy as np
 import vedo
-
+from copy import deepcopy
 
 class Camera:
     pass
@@ -122,32 +122,13 @@ class Viewer:
         meshes: Meshes,
     ) -> view_types.Raster:
         
+        updatedmeshes : Meshes = Meshes()
+        updatedmeshes.meshes = deepcopy(meshes.meshes)
+
         print(self.view_mode) #testing print
 
         if self.view_mode == self.Perspective.ORTHOGRAPHIC:
             print("in ortho")
-            up = np.array([0,1,0])
-            gaze = self.cam.get_focal_point()
-            eye = self.cam.get_position()
-            
-            for key in meshes.meshes:
-                curmesh = meshes.meshes[key]
-                vertices = curmesh.vertices
-                faces = curmesh.cells
-                color = curmesh.color()
-
-                #camera transform
-                transformed_vertices = self.camera_transform(vertices,eye,gaze,up)
-
-                #projection transformation 
-                perspective_vertices = self.project_vertices(transformed_vertices,"orhtographic", near= 1, far=10)               
-
-                #viewport transformation
-                final_transform = self.viewport_transform(perspective_vertices, display.width,display.height)
-
-                curmesh.vertices = final_transform
-                curmesh.faces = faces
-                print(curmesh.vertices)
             return rasterize.render(display,meshes,self.cam)
         
         if self.view_mode == self.Perspective.PERSPECTIVE:
@@ -156,12 +137,11 @@ class Viewer:
             gaze = self.cam.get_focal_point()
             eye = self.cam.get_position()
             
-            for key in meshes.meshes:
-                curmesh = meshes.meshes[key]
-                vertices = curmesh.vertices
+            for key in updatedmeshes.meshes:
+                newmesh = updatedmeshes.meshes[key]
+                vertices = newmesh.vertices
                 print(vertices)
-                faces = curmesh.cells
-                color = curmesh.color()
+                faces = newmesh.cells
 
                 #camera transform
                 transformed_vertices = self.camera_transform(vertices,eye,gaze,up)
@@ -173,11 +153,12 @@ class Viewer:
                 final_transform = self.viewport_transform(perspective_vertices, display.width,display.height)
 
                 #self.updatedmeshes.add_mesh(final_transform,faces,color)
-                curmesh.vertices = final_transform
-                curmesh.faces = faces
-                print(curmesh.vertices)
+                newmesh.vertices = final_transform
+                newmesh.faces = faces
+                print(newmesh.vertices)
+                print(meshes.meshes[key].vertices)
 
-            return rasterize.render(display,meshes,self.cam)
+            return rasterize.render(display,updatedmeshes,self.cam)
         
         if self.render_mode == self.Rendering.RASTERIZE:
             print('rasterize')
