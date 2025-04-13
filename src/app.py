@@ -188,8 +188,12 @@ class MainWindow(QMainWindow):
         open_button = self.comp_widgets.findChild(QPushButton, "open_button")
         open_text = self.comp_widgets.findChild(QPlainTextEdit, "open_text")
         save_button = self.comp_widgets.findChild(QPushButton, "save_button")
-        save_as_button = self.comp_widgets.findChild(QPushButton, "save_as_button")
-        save_as_text = self.comp_widgets.findChild(QPlainTextEdit, "save_as_text")
+        save_as_button = self.comp_widgets.findChild(
+            QPushButton, "save_as_button"
+        )
+        save_as_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "save_as_text"
+        )
         if (
             new_button is None
             or open_button is None
@@ -230,18 +234,42 @@ class MainWindow(QMainWindow):
         rotate_right = QHBoxLayout()
         zoom_in = QHBoxLayout()
         zoom_out = QHBoxLayout()
-        rotate_up_button = self.comp_widgets.findChild(QPushButton, "rotate_up_button")
-        rotate_down_button = self.comp_widgets.findChild(QPushButton, "rotate_down_button")
-        rotate_left_button = self.comp_widgets.findChild(QPushButton, "rotate_left_button")
-        rotate_right_button = self.comp_widgets.findChild(QPushButton, "rotate_right_button")
-        zoom_in_button = self.comp_widgets.findChild(QPushButton, "zoom_in_button")
-        zoom_out_button = self.comp_widgets.findChild(QPushButton, "zoom_out_button")
-        rotate_up_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_up_text")
-        rotate_down_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_down_text")
-        rotate_left_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_left_text")
-        rotate_right_text = self.comp_widgets.findChild(QPlainTextEdit, "rotate_right_text")
-        zoom_in_text = self.comp_widgets.findChild(QPlainTextEdit, "zoom_in_text")
-        zoom_out_text = self.comp_widgets.findChild(QPlainTextEdit, "zoom_out_text")
+        rotate_up_button = self.comp_widgets.findChild(
+            QPushButton, "rotate_up_button"
+        )
+        rotate_down_button = self.comp_widgets.findChild(
+            QPushButton, "rotate_down_button"
+        )
+        rotate_left_button = self.comp_widgets.findChild(
+            QPushButton, "rotate_left_button"
+        )
+        rotate_right_button = self.comp_widgets.findChild(
+            QPushButton, "rotate_right_button"
+        )
+        zoom_in_button = self.comp_widgets.findChild(
+            QPushButton, "zoom_in_button"
+        )
+        zoom_out_button = self.comp_widgets.findChild(
+            QPushButton, "zoom_out_button"
+        )
+        rotate_up_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "rotate_up_text"
+        )
+        rotate_down_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "rotate_down_text"
+        )
+        rotate_left_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "rotate_left_text"
+        )
+        rotate_right_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "rotate_right_text"
+        )
+        zoom_in_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "zoom_in_text"
+        )
+        zoom_out_text = self.comp_widgets.findChild(
+            QPlainTextEdit, "zoom_out_text"
+        )
         if (
             rotate_up_button is None
             or rotate_down_button is None
@@ -291,7 +319,9 @@ class MainWindow(QMainWindow):
         self.home_menu.rotate_down.addWidget(self.home_menu.rotate_down_text)
         self.home_menu.rotate_left.addWidget(self.home_menu.rotate_left_button)
         self.home_menu.rotate_left.addWidget(self.home_menu.rotate_left_text)
-        self.home_menu.rotate_right.addWidget(self.home_menu.rotate_right_button)
+        self.home_menu.rotate_right.addWidget(
+            self.home_menu.rotate_right_button
+        )
         self.home_menu.rotate_right.addWidget(self.home_menu.rotate_right_text)
         self.home_menu.zoom_in.addWidget(self.home_menu.zoom_in_button)
         self.home_menu.zoom_in.addWidget(self.home_menu.zoom_in_text)
@@ -299,9 +329,15 @@ class MainWindow(QMainWindow):
         self.home_menu.zoom_out.addWidget(self.home_menu.zoom_out_text)
 
         self.home_menu.rotate_up_button.clicked.connect(self.home_rotate_up)
-        self.home_menu.rotate_down_button.clicked.connect(self.home_rotate_down)
-        self.home_menu.rotate_left_button.clicked.connect(self.home_rotate_left)
-        self.home_menu.rotate_right_button.clicked.connect(self.home_rotate_right)
+        self.home_menu.rotate_down_button.clicked.connect(
+            self.home_rotate_down
+        )
+        self.home_menu.rotate_left_button.clicked.connect(
+            self.home_rotate_left
+        )
+        self.home_menu.rotate_right_button.clicked.connect(
+            self.home_rotate_right
+        )
         self.home_menu.zoom_in_button.clicked.connect(self.home_zoom_in)
         self.home_menu.zoom_out_button.clicked.connect(self.home_zoom_out)
 
@@ -309,21 +345,37 @@ class MainWindow(QMainWindow):
         self.insert_menu = self.InsertMenu(
             mesh_label=self.comp_widgets.findChild(QLabel, "mesh_label"),
             mesh_combo=self.comp_widgets.findChild(QComboBox, "mesh_combo"),
-            vertices_label=self.comp_widgets.findChild(QLabel, "vertices_label"),
-            new_vertices_text=self.comp_widgets.findChild(QPlainTextEdit, "new_vertices_text"),
+            vertices_label=self.comp_widgets.findChild(
+                QLabel, "vertices_label"
+            ),
+            new_vertices_text=self.comp_widgets.findChild(
+                QPlainTextEdit, "new_vertices_text"
+            ),
             faces_label=self.comp_widgets.findChild(QLabel, "faces_label"),
-            new_faces_text=self.comp_widgets.findChild(QPlainTextEdit, "new_faces_text"),
+            new_faces_text=self.comp_widgets.findChild(
+                QPlainTextEdit, "new_faces_text"
+            ),
             color_label=self.comp_widgets.findChild(QLabel, "color_label"),
-            new_color_text=self.comp_widgets.findChild(QPlainTextEdit, "new_color_text"),
-            add_new_mesh=self.comp_widgets.findChild(QPushButton, "add_new_mesh"),
+            new_color_text=self.comp_widgets.findChild(
+                QPlainTextEdit, "new_color_text"
+            ),
+            add_new_mesh=self.comp_widgets.findChild(
+                QPushButton, "add_new_mesh"
+            ),
         )
 
         self.insert_menu.mesh_combo.setCurrentIndex(-1)
         self.insert_menu.mesh_combo.setPlaceholderText("Select Mesh")
 
-        self.insert_menu.new_vertices_text.setPlaceholderText("[(x,y,z),...] format")
-        self.insert_menu.new_faces_text.setPlaceholderText("[(v1,v2,v3),...] format")
-        self.insert_menu.new_color_text.setPlaceholderText("[R,G,B] 0-255 format")
+        self.insert_menu.new_vertices_text.setPlaceholderText(
+            "[(x,y,z),...] format"
+        )
+        self.insert_menu.new_faces_text.setPlaceholderText(
+            "[(v1,v2,v3),...] format"
+        )
+        self.insert_menu.new_color_text.setPlaceholderText(
+            "[R,G,B] 0-255 format"
+        )
 
         self.sidebar.addWidget(self.insert_menu.mesh_label)
         self.sidebar.addWidget(self.insert_menu.mesh_combo)
@@ -335,16 +387,26 @@ class MainWindow(QMainWindow):
         self.sidebar.addWidget(self.insert_menu.new_color_text)
         self.sidebar.addWidget(self.insert_menu.add_new_mesh)
 
-        self.insert_menu.mesh_combo.currentIndexChanged.connect(self.insert_insert_mesh)
+        self.insert_menu.mesh_combo.currentIndexChanged.connect(
+            self.insert_insert_mesh
+        )
         self.insert_menu.add_new_mesh.clicked.connect(self.insert_add_new)
 
     def init_view_menu(self) -> None:
         if self.comp_widgets is None or self.sidebar is None:
             return
-        ray_tracing_label = self.comp_widgets.findChild(QLabel, "ray_tracing_label")
-        ray_tracing_combo = self.comp_widgets.findChild(QComboBox, "ray_tracing_combo")
-        projection_label = self.comp_widgets.findChild(QLabel, "projection_label")
-        projection_combo = self.comp_widgets.findChild(QComboBox, "projection_combo")
+        ray_tracing_label = self.comp_widgets.findChild(
+            QLabel, "ray_tracing_label"
+        )
+        ray_tracing_combo = self.comp_widgets.findChild(
+            QComboBox, "ray_tracing_combo"
+        )
+        projection_label = self.comp_widgets.findChild(
+            QLabel, "projection_label"
+        )
+        projection_combo = self.comp_widgets.findChild(
+            QComboBox, "projection_combo"
+        )
         if (
             ray_tracing_label is None
             or ray_tracing_combo is None
@@ -365,8 +427,12 @@ class MainWindow(QMainWindow):
         self.sidebar.addWidget(self.view_menu.projection_label)
         self.sidebar.addWidget(self.view_menu.projection_combo)
 
-        self.view_menu.ray_tracing_combo.currentIndexChanged.connect(self.view_ray_tracing)
-        self.view_menu.projection_combo.currentIndexChanged.connect(self.view_projection)
+        self.view_menu.ray_tracing_combo.currentIndexChanged.connect(
+            self.view_ray_tracing
+        )
+        self.view_menu.projection_combo.currentIndexChanged.connect(
+            self.view_projection
+        )
 
     def main_file(self) -> None:
         """event handler for self.main_menu.file_button"""
@@ -564,7 +630,9 @@ class MainWindow(QMainWindow):
     def home_zoom_in(self) -> None:
         """event handler for self.home_menu.rotate_left_button"""
         try:
-            self.viewer.zoom_cam(-1 * np.float64(self.home_menu.zoom_in_text.toPlainText()))
+            self.viewer.zoom_cam(
+                -1 * np.float64(self.home_menu.zoom_in_text.toPlainText())
+            )
         except Exception as e:
             print(e)
         self.update_display()
@@ -572,7 +640,9 @@ class MainWindow(QMainWindow):
     def home_zoom_out(self) -> None:
         """event handler for self.home_menu.rotate_left_button"""
         try:
-            self.viewer.zoom_cam(np.float64(self.home_menu.zoom_out_text.toPlainText()))
+            self.viewer.zoom_cam(
+                np.float64(self.home_menu.zoom_out_text.toPlainText())
+            )
         except Exception as e:
             print(e)
         self.update_display()

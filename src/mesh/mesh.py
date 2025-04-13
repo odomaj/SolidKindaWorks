@@ -2,6 +2,7 @@ from typing import Annotated, Any
 from random import choice
 from string import ascii_letters, digits
 from pathlib import Path
+from copy import deepcopy
 import proto.mesh_pb2
 import vedo
 import struct
@@ -25,7 +26,9 @@ class Meshes:
 
     def gen_id(self, len: int) -> str:
         while True:
-            new_id = "".join(choice(ascii_letters.join(digits)) for _ in range(len))
+            new_id = "".join(
+                choice(ascii_letters.join(digits)) for _ in range(len)
+            )
             if new_id not in self.meshes:
                 return new_id
 
@@ -54,10 +57,14 @@ class Meshes:
         protobuf.ParseFromString(serialized_mesh)
 
         vertices: Vertices = np.frombuffer(protobuf.vertices, dtype=np.float64)
-        vertices = vertices.reshape((protobuf.vertices_shape.row, protobuf.vertices_shape.col))
+        vertices = vertices.reshape(
+            (protobuf.vertices_shape.row, protobuf.vertices_shape.col)
+        )
 
         faces: Faces = np.frombuffer(protobuf.faces, dtype=np.int64)
-        faces = faces.reshape((protobuf.faces_shape.row, protobuf.faces_shape.col))
+        faces = faces.reshape(
+            (protobuf.faces_shape.row, protobuf.faces_shape.col)
+        )
 
         color: RGB = np.frombuffer(protobuf.color, dtype=np.float64)
 
@@ -69,7 +76,9 @@ class Meshes:
         try:
             with path.open("wb") as file:
                 for id in self.meshes:
-                    serialized_mesh: bytes = self.serialize_mesh(id, self.meshes[id])
+                    serialized_mesh: bytes = self.serialize_mesh(
+                        id, self.meshes[id]
+                    )
                     file.write(struct.pack("<I", len(serialized_mesh)))
                     file.write(serialized_mesh)
         except Exception as e:
@@ -92,3 +101,9 @@ class Meshes:
             print(f"[ERROR] failed to load mesh to {path.absolute()}: {e}")
             return False
         return True
+
+
+def copy_mesh(mesh: Meshes) -> Meshes:
+    new_mesh = Meshes()
+    new_mesh.meshes = deepcopy(mesh.meshes)
+    return new_mesh
