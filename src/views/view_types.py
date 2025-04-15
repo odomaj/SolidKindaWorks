@@ -3,7 +3,7 @@ from typing import Annotated, Any
 from enum import Enum
 import numpy as np
 
-Raster = Annotated[np.ndarray[Any, np.dtype[Any]], "M x N Raster"]
+Raster = Annotated[np.ndarray[Any, np.dtype[Any]], "shape=(n,m)"]
 
 
 @dataclass

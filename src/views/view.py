@@ -17,13 +17,20 @@ class Viewer:
     render_mode: Rendering = Rendering.RASTERIZE
 
     cam: camera.Camera
+    lights: list[ray_trace.Light]
 
     def change_view_mode(self, mode: Perspective):
         self.view_mode = mode
 
     def __init__(self, cam: camera.Camera | None = None):
         self.cam = camera.Camera()
-
+        self.lights = [
+            ray_trace.Light(
+                pos=np.array([0, 10, 0], dtype=np.float64),
+                color=np.ones(3, dtype=np.float64),
+                intensity=np.float64(1),
+            )
+        ]
         self.cam.set_position(np.array([0, 0, 10], dtype=np.float64))
         self.cam.set_focal_point(np.array([50, 40, 50], dtype=np.float64))
 
@@ -37,7 +44,7 @@ class Viewer:
                 return rasterize.render_pers(display, meshes, self.cam)
             return rasterize.render_orth(display, meshes, self.cam)
         if self.render_mode == self.Rendering.RAY_TRACE:
-            return ray_trace.render(display, meshes, self.cam)
+            return ray_trace.render(display, meshes, self.cam, self.lights)
         return np.random.randint(
             0, 255, size=(display.width, display.height, 3), dtype=np.uint8
         )
