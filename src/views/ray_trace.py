@@ -1,3 +1,5 @@
+"""currently broken ray tracing algorithm"""
+
 from views import view_types, camera
 from mesh.mesh import Meshes, Vertex, Vertices, RGB
 from dataclasses import dataclass
@@ -72,7 +74,7 @@ def shade(
             * KS
         )
     total_light += color * AMBIENT_LIGHT * KA
-    return np.zeros(3, dtype=np.float64)
+    return total_light
 
 
 def compute_ray(
@@ -122,6 +124,7 @@ def compute_ray(
     )
 
 
+"""
 def render(
     display: view_types.Display,
     meshes: Meshes,
@@ -162,3 +165,24 @@ def render(
             end: Vertex = start + (FAR * gaze)
             raster[y, x] = compute_ray(start, end, meshes, lights)
     return raster
+
+"""
+
+
+def render(
+    display: view_types.Display,
+    meshes: Meshes,
+    cam: camera.Camera,
+    lights: list[Light],
+) -> view_types.Raster:
+    plotter = vedo.Plotter(offscreen=True)
+    for key in meshes.meshes:
+        meshes.meshes[key].compute_normals()
+        meshes.meshes[key].properties.SetInterpolationToPhong()
+        plotter.add(meshes.meshes[key])
+
+    plotter.show(size=[display.width, display.height], camera=cam.cam)
+    out = np.array(plotter.screenshot(asarray=True), dtype=np.uint8)
+    for key in meshes.meshes:
+        meshes.meshes[key].flat()
+    return out
