@@ -7,6 +7,7 @@ import vedo
 FOV: np.float64 = np.float64(np.pi / 2)
 NEAR: np.float64 = np.float64(1.0)
 FAR: np.float64 = np.float64(20.0)
+AMBIENT_LIGHT: np.float64 = np.float64(0.1)
 
 
 @dataclass
@@ -42,7 +43,35 @@ def closest_intersection(
     return close
 
 
-def shade(mesh: vedo.Mesh, lights: list[Light]) -> RGB:
+def shade(
+    mesh: vedo.Mesh,
+    gaze: Vertex,
+    face_position: Vertex,
+    face_normal: Vertex,
+    lights: list[Light],
+) -> RGB:
+    KA: np.float64 = np.float64(0.5)
+    KS: np.float64 = np.float64(0.5)
+    KD: np.float64 = np.float64(0.5)
+
+    total_light: RGB = np.zeros(3, dtype=np.float64)
+    color: RGB = np.array(mesh.color(), dtype=np.float64)
+    for light in lights:
+        light_vector: Vertex = normalize(face_position - light.pos)
+        light_color: RGB = color * light.color
+        total_light += (
+            light.intensity
+            * light_color
+            * max(0, np.dot(face_normal, light_vector))
+            * KD
+        )
+        total_light += (
+            light.intensity
+            * light_color
+            * max(0, np.dot(face_normal, normalize(gaze + light_vector)))
+            * KS
+        )
+    total_light += color * AMBIENT_LIGHT * KA
     return np.zeros(3, dtype=np.float64)
 
 
@@ -54,6 +83,7 @@ def compute_ray(
 ) -> RGB:
     intersections: dict[str, Vertices] = {}
     for key in meshes.meshes:
+        meshes.meshes[key].compute_normals()
         all_ints: Vertices = meshes.meshes[key].intersect_with_line(p0=near, p1=far)  # type: ignore
         close_int: Vertex | None = closest_intersection(near, all_ints)
         if close_int is not None:
@@ -76,16 +106,20 @@ def compute_ray(
             closest = intersections[key]
             closest_d = test
             mesh_id = key
-    return shade(meshes.meshes[mesh_id], lights)
-
-
-def gen_raster_plane(cam: camera.Camera):
-    position: Vertex | None = cam.get_position()
-    if position is None:
-        return
-    focal_point: Vertex | None = cam.get_focal_point()
-    if focal_point is None:
-        focal_point = np.zeros(3, dtype=np.float64)
+    ints, faces = meshes.meshes[mesh_id].intersect_with_line(
+        p0=near, p1=far, return_ids=True
+    )
+    face_normal = None
+    for i in range(len(ints)):
+        if np.array_equal(ints[i], closest):  # type: ignore
+            face_normal = meshes.meshes[mesh_id].cell_normals[faces[i]]
+            break
+    if face_normal is None:
+        print("serious problem when ray tracing")
+        return np.zeros(3, dtype=np.float64)
+    return shade(
+        meshes.meshes[mesh_id], far - near, closest, face_normal, lights  # type: ignore
+    )
 
 
 def render(
